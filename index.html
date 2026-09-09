@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Facebook - Super Farmacia</title>
+
+<title>Facebook - Super Farmacia Virgen de Copacabana</title>
 
 <style>
 *{
@@ -20,8 +21,9 @@ html, body{
     font-family:Arial, Helvetica, sans-serif;
 }
 
-#fb-root{
-    display:none;
+body{
+    width:100vw;
+    height:100vh;
 }
 
 .screen{
@@ -33,30 +35,31 @@ html, body{
 }
 
 .header{
-    height:12vh;
-    min-height:70px;
+    height:110px;
+    flex-shrink:0;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 3vw;
-    background:#ffffff;
+    padding:0 50px;
+    background:white;
     border-bottom:1px solid #e5e9ef;
 }
 
 .brand h1{
     margin:0;
-    font-size:2vw;
+    font-size:34px;
     color:#174c87;
+    font-weight:700;
 }
 
 .brand p{
-    margin:5px 0 0;
-    font-size:1.1vw;
+    margin:7px 0 0;
+    font-size:20px;
     color:#65758b;
 }
 
 .facebook-title{
-    font-size:1.4vw;
+    font-size:26px;
     font-weight:bold;
     color:#1877f2;
 }
@@ -64,32 +67,48 @@ html, body{
 .content{
     flex:1;
     width:100%;
-    height:88vh;
-    display:flex;
-    align-items:stretch;
-    justify-content:center;
-    padding:0;
-    margin:0;
+    height:calc(100vh - 110px);
+    overflow:hidden;
+    background:white;
+    position:relative;
 }
 
 .facebook-box{
     width:100%;
     height:100%;
-    margin:0;
-    padding:0;
-    border-radius:0;
-    box-shadow:none;
-    background:#fff;
     overflow:hidden;
+    background:white;
+
     display:flex;
     justify-content:center;
     align-items:flex-start;
 }
 
-.fb-page{
-    width:100% !important;
-    height:100% !important;
+/*
+Facebook limita el ancho del plugin.
+Por eso lo ampliamos visualmente.
+*/
+
+.fb-wrapper{
+    width:500px;
+    height:700px;
+
+    transform:scale(2.2);
+    transform-origin:top center;
+
+    margin-top:10px;
 }
+
+.fb-page{
+    width:500px !important;
+    height:700px !important;
+}
+
+/* Oculta scroll externo */
+iframe{
+    border:none !important;
+}
+
 </style>
 </head>
 
@@ -97,9 +116,13 @@ html, body{
 
 <div id="fb-root"></div>
 
-<script async defer crossorigin="anonymous"
-src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v23.0">
+<script
+    async
+    defer
+    crossorigin="anonymous"
+    src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v23.0">
 </script>
+
 
 <div class="screen">
 
@@ -116,30 +139,35 @@ src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v23.0">
 
     </div>
 
+
     <div class="content">
 
         <div class="facebook-box">
 
-            <div
-                class="fb-page"
-                data-href="https://www.facebook.com/SuperFarmaciaVC/"
-                data-tabs="timeline"
-                data-width="1200"
-                data-height="900"
-                data-small-header="false"
-                data-adapt-container-width="true"
-                data-hide-cover="false"
-                data-show-facepile="false">
+            <div class="fb-wrapper">
 
-                <blockquote
-                    cite="https://www.facebook.com/SuperFarmaciaVC/"
-                    class="fb-xfbml-parse-ignore">
+                <div
+                    class="fb-page"
+                    data-href="https://www.facebook.com/SuperFarmaciaVC/"
+                    data-tabs="timeline"
+                    data-width="500"
+                    data-height="700"
+                    data-small-header="false"
+                    data-adapt-container-width="false"
+                    data-hide-cover="false"
+                    data-show-facepile="false">
 
-                    <a href="https://www.facebook.com/SuperFarmaciaVC/">
-                        Super Farmacia Virgen de Copacabana
-                    </a>
+                    <blockquote
+                        cite="https://www.facebook.com/SuperFarmaciaVC/"
+                        class="fb-xfbml-parse-ignore">
 
-                </blockquote>
+                        <a href="https://www.facebook.com/SuperFarmaciaVC/">
+                            Super Farmacia Virgen de Copacabana
+                        </a>
+
+                    </blockquote>
+
+                </div>
 
             </div>
 
