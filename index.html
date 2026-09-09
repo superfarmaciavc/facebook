@@ -1,143 +1,153 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facebook - Super Farmacia</title>
 
-  <title>Super Farmacia Virgen de Copacabana</title>
+<style>
+*{
+    box-sizing:border-box;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+html, body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:white;
+    font-family:Arial, Helvetica, sans-serif;
+}
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #f4f7fb;
-      font-family: Arial, Helvetica, sans-serif;
-      overflow: hidden;
-    }
+#fb-root{
+    display:none;
+}
 
-    .screen {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+.screen{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:white;
+}
 
-    .header {
-      height: 90px;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
-      border-bottom: 1px solid #e5e9ef;
-    }
+.header{
+    height:12vh;
+    min-height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 3vw;
+    background:#ffffff;
+    border-bottom:1px solid #e5e9ef;
+}
 
-    .brand h1 {
-      margin: 0;
-      color: #174c87;
-      font-size: 28px;
-    }
+.brand h1{
+    margin:0;
+    font-size:2vw;
+    color:#174c87;
+}
 
-    .brand p {
-      margin: 6px 0 0;
-      color: #65758b;
-      font-size: 16px;
-    }
+.brand p{
+    margin:5px 0 0;
+    font-size:1.1vw;
+    color:#65758b;
+}
 
-    .facebook-title {
-      color: #1877f2;
-      font-weight: 700;
-      font-size: 18px;
-    }
+.facebook-title{
+    font-size:1.4vw;
+    font-weight:bold;
+    color:#1877f2;
+}
 
-    .content {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 25px;
-    }
+.content{
+    flex:1;
+    width:100%;
+    height:88vh;
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
+    padding:0;
+    margin:0;
+}
 
-    .facebook-box {
-      width: 100%;
-      max-width: 1000px;
-      height: calc(100vh - 140px);
-      background: #ffffff;
-      border-radius: 22px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: 15px;
-    }
+.facebook-box{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    border-radius:0;
+    box-shadow:none;
+    background:#fff;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+}
 
-    .fb-page {
-      width: 100%;
-    }
-  </style>
+.fb-page{
+    width:100% !important;
+    height:100% !important;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- SDK de Facebook -->
-  <div id="fb-root"></div>
+<div id="fb-root"></div>
 
-  <script async defer crossorigin="anonymous"
-    src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v23.0">
-  </script>
+<script async defer crossorigin="anonymous"
+src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v23.0">
+</script>
 
-  <div class="screen">
+<div class="screen">
 
     <div class="header">
-      <div class="brand">
-        <h1>Super Farmacia Virgen de Copacabana</h1>
-        <p>Nuestro compromiso es tu bienestar</p>
-      </div>
 
-      <div class="facebook-title">
-        Facebook · @SuperFarmaciaVC
-      </div>
+        <div class="brand">
+            <h1>Super Farmacia Virgen de Copacabana</h1>
+            <p>Nuestro compromiso es tu bienestar</p>
+        </div>
+
+        <div class="facebook-title">
+            Facebook · @SuperFarmaciaVC
+        </div>
+
     </div>
 
     <div class="content">
 
-      <div class="facebook-box">
+        <div class="facebook-box">
 
-        <div
-          class="fb-page"
-          data-href="https://www.facebook.com/SuperFarmaciaVC/"
-          data-tabs="timeline"
-          data-width="900"
-          data-height="700"
-          data-small-header="false"
-          data-adapt-container-width="true"
-          data-hide-cover="false"
-          data-show-facepile="false">
-          
-          <blockquote
-            cite="https://www.facebook.com/SuperFarmaciaVC/"
-            class="fb-xfbml-parse-ignore">
+            <div
+                class="fb-page"
+                data-href="https://www.facebook.com/SuperFarmaciaVC/"
+                data-tabs="timeline"
+                data-width="1200"
+                data-height="900"
+                data-small-header="false"
+                data-adapt-container-width="true"
+                data-hide-cover="false"
+                data-show-facepile="false">
 
-            <a href="https://www.facebook.com/SuperFarmaciaVC/">
-              Super Farmacia Virgen de Copacabana
-            </a>
+                <blockquote
+                    cite="https://www.facebook.com/SuperFarmaciaVC/"
+                    class="fb-xfbml-parse-ignore">
 
-          </blockquote>
+                    <a href="https://www.facebook.com/SuperFarmaciaVC/">
+                        Super Farmacia Virgen de Copacabana
+                    </a>
+
+                </blockquote>
+
+            </div>
 
         </div>
 
-      </div>
-
     </div>
 
-  </div>
+</div>
 
 </body>
 </html>
