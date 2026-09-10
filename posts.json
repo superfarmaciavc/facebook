@@ -1,15 +1,16 @@
 [
   {
-    "type": "image",
+    "type": "video",
     "text": "💙 ¡Así vivimos el Día del Peatón! 💙\n\nCompartimos una mañana llena de energía, movimiento y bienestar 🙌✨\n\n💃 Bailamos al ritmo de la zumba\n🥤 Disfrutamos las degustaciones de Colnatur y FontActiv\n☀️ Conocimos el cuidado y la protección de Heliocare\n🎁 Y vivimos muchos momentos especiales\n\nGracias a todos los que fueron parte.\nNuestro compromiso es tu bienestar. 💙\n\n¡El próximo año te esperamos para volver a vivirlo juntos! 🎉\n\n#zumba #diadelpeaton #alegria #energía #deporte Ver menos",
     "image": "posts/post_1.jpg",
-    "video": "",
+    "video": "posts/video_1.mp4",
     "url": "https://www.facebook.com/reel/1602500571407263",
     "date": "Publicación reciente",
     "likes": "1",
     "comments_count": "—",
     "shares": "—",
     "timestamp": 0,
-    "scraped_at": "2026-09-10T22:17:56.773255+00:00"
+    "source": "principal",
+    "scraped_at": "2026-09-10T22:38:39.803320+00:00"
   }
 ]
