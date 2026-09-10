@@ -2,7 +2,6 @@
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -36,11 +35,44 @@
         }
 
 
-        /* CONTENEDOR PRINCIPAL */
+        /* =====================================
+           ENCABEZADO
+        ====================================== */
+
+        .header{
+            width:100%;
+            height:80px;
+
+            background:#174c87;
+            color:#ffffff;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+
+            padding:0 3vw;
+
+            flex-shrink:0;
+        }
+
+        .header-title{
+            font-size:26px;
+            font-weight:700;
+        }
+
+        .header-subtitle{
+            font-size:18px;
+            font-weight:400;
+        }
+
+
+        /* =====================================
+           CONTENIDO PRINCIPAL
+        ====================================== */
 
         .screen{
             width:100vw;
-            height:100vh;
+            height:calc(100vh - 80px);
 
             display:flex;
 
@@ -48,9 +80,9 @@
         }
 
 
-        /* =======================================
+        /* =====================================
            IZQUIERDA: IMAGEN
-        ======================================= */
+        ====================================== */
 
         .image-area{
             width:45%;
@@ -76,19 +108,19 @@
         }
 
 
-        /* =======================================
+        /* =====================================
            DERECHA
-        ======================================= */
+        ====================================== */
 
         .info{
             width:55%;
             height:100%;
 
             padding:
-                4vh
-                3.2vw
-                3vh
-                3.2vw;
+                3.5vh
+                3vw
+                2.5vh
+                3vw;
 
             display:flex;
             flex-direction:column;
@@ -97,7 +129,9 @@
         }
 
 
-        /* PERFIL */
+        /* =====================================
+           PERFIL
+        ====================================== */
 
         .profile{
             display:flex;
@@ -107,11 +141,9 @@
 
             flex-shrink:0;
 
-            margin-bottom:2.5vh;
+            margin-bottom:2.2vh;
         }
 
-
-        /* AVATAR SF */
 
         .avatar{
             width:64px;
@@ -162,9 +194,9 @@
         }
 
 
-        /* =======================================
+        /* =====================================
            DESCRIPCIÓN
-        ======================================= */
+        ====================================== */
 
         .description-wrap{
             flex:1;
@@ -182,7 +214,7 @@
             height:100%;
 
             font-size:26px;
-            line-height:1.48;
+            line-height:1.45;
 
             white-space:pre-wrap;
 
@@ -195,9 +227,9 @@
         }
 
 
-        /* =======================================
+        /* =====================================
            MÉTRICAS
-        ======================================= */
+        ====================================== */
 
         .stats{
             flex-shrink:0;
@@ -246,30 +278,50 @@
         }
 
 
-        /* =======================================
-           ESTADO DE CARGA
-        ======================================= */
+        /* =====================================
+           CARGANDO
+        ====================================== */
 
         .loading{
             width:100%;
-            height:100%;
+            height:calc(100vh - 80px);
 
             display:flex;
             align-items:center;
             justify-content:center;
 
             font-size:28px;
-            color:#174c87;
 
+            color:#174c87;
             background:#ffffff;
         }
 
 
-        /* =======================================
-           ADAPTACIÓN PANTALLAS PEQUEÑAS
-        ======================================= */
+        /* =====================================
+           PANTALLAS PEQUEÑAS
+        ====================================== */
 
         @media(max-width:900px){
+
+            .header{
+                height:70px;
+            }
+
+            .header-title{
+                font-size:20px;
+            }
+
+            .header-subtitle{
+                font-size:15px;
+            }
+
+            .screen{
+                height:calc(100vh - 70px);
+            }
+
+            .loading{
+                height:calc(100vh - 70px);
+            }
 
             .image-area{
                 width:43%;
@@ -302,6 +354,28 @@
 <body>
 
 
+<!-- =====================================
+     ENCABEZADO
+====================================== -->
+
+<header class="header">
+
+    <div class="header-title">
+        Super Farmacia Virgen de Copacabana
+    </div>
+
+    <div class="header-subtitle">
+        Nuestro compromiso es tu bienestar
+    </div>
+
+</header>
+
+
+
+<!-- =====================================
+     CARGANDO
+====================================== -->
+
 <div
     id="loading"
     class="loading"
@@ -310,6 +384,11 @@
 </div>
 
 
+
+<!-- =====================================
+     CONTENIDO
+====================================== -->
+
 <div
     id="screen"
     class="screen"
@@ -317,9 +396,7 @@
 >
 
 
-    <!-- =====================================
-         IZQUIERDA: IMAGEN
-    ====================================== -->
+    <!-- IMAGEN -->
 
     <div class="image-area">
 
@@ -333,9 +410,7 @@
 
 
 
-    <!-- =====================================
-         DERECHA: INFORMACIÓN
-    ====================================== -->
+    <!-- INFORMACIÓN -->
 
     <div class="info">
 
@@ -383,7 +458,7 @@
 
 
 
-        <!-- ESTADÍSTICAS -->
+        <!-- MÉTRICAS -->
 
         <div class="stats">
 
@@ -448,19 +523,12 @@
 <script>
 
 
-/* =========================================
-   CONFIGURACIÓN
-========================================= */
-
 const POSTS_JSON = "posts.json";
 
 const ACTUALIZACION_MS =
     60 * 60 * 1000;
 
 
-/* =========================================
-   CARGAR PUBLICACIÓN
-========================================= */
 
 async function cargarPublicacion(){
 
@@ -506,23 +574,17 @@ async function cargarPublicacion(){
 
         /* IMAGEN */
 
-        const imagen =
-            document.getElementById(
-                "postImage"
-            );
-
-        imagen.src =
+        document.getElementById(
+            "postImage"
+        ).src =
             post.image || "";
 
 
         /* TEXTO */
 
-        const texto =
-            document.getElementById(
-                "postText"
-            );
-
-        texto.textContent =
+        document.getElementById(
+            "postText"
+        ).textContent =
             post.text || "";
 
 
@@ -536,7 +598,7 @@ async function cargarPublicacion(){
             "Publicación reciente";
 
 
-        /* MÉTRICAS */
+        /* REACCIONES */
 
         document.getElementById(
             "likes"
@@ -544,11 +606,15 @@ async function cargarPublicacion(){
             post.likes || "—";
 
 
+        /* COMENTARIOS */
+
         document.getElementById(
             "comments"
         ).textContent =
             post.comments_count || "—";
 
+
+        /* COMPARTIDOS */
 
         document.getElementById(
             "shares"
@@ -556,7 +622,7 @@ async function cargarPublicacion(){
             post.shares || "—";
 
 
-        /* MOSTRAR PANTALLA */
+        /* MOSTRAR */
 
         document.getElementById(
             "loading"
@@ -569,8 +635,6 @@ async function cargarPublicacion(){
         ).style.display =
             "flex";
 
-
-        /* AJUSTAR DESCRIPCIÓN */
 
         requestAnimationFrame(
             ajustarDescripcion
@@ -597,9 +661,9 @@ async function cargarPublicacion(){
 
 
 
-/* =========================================
-   AJUSTAR TAMAÑO DEL TEXTO
-========================================= */
+/* =====================================
+   AJUSTAR TEXTO AUTOMÁTICAMENTE
+====================================== */
 
 function ajustarDescripcion(){
 
@@ -635,36 +699,17 @@ function ajustarDescripcion(){
 
 
 
-/* =========================================
-   ERROR DE IMAGEN
-========================================= */
-
-document.getElementById(
-    "postImage"
-).addEventListener(
-    "error",
-    function(){
-
-        console.log(
-            "No se pudo cargar la imagen."
-        );
-
-    }
-);
-
-
-
-/* =========================================
-   INICIO
-========================================= */
+/* =====================================
+   CARGAR
+====================================== */
 
 cargarPublicacion();
 
 
 
-/* =========================================
-   ACTUALIZACIÓN AUTOMÁTICA
-========================================= */
+/* =====================================
+   ACTUALIZAR CADA HORA
+====================================== */
 
 setInterval(
 
@@ -676,9 +721,9 @@ setInterval(
 
 
 
-/* =========================================
-   AJUSTAR SI CAMBIA RESOLUCIÓN
-========================================= */
+/* =====================================
+   AJUSTE DE RESOLUCIÓN
+====================================== */
 
 window.addEventListener(
     "resize",
