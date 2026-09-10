@@ -2,42 +2,61 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
 <title>Facebook - Super Farmacia</title>
 
 <style>
+
 *{
     box-sizing:border-box;
 }
 
-html, body{
+html,
+body{
     margin:0;
     padding:0;
+
     width:100%;
     height:100%;
+
     overflow:hidden;
+
     background:#ffffff;
 
     font-family:
-    Arial,
-    "Segoe UI",
-    "Segoe UI Emoji",
-    "Apple Color Emoji",
-    sans-serif;
+        Arial,
+        "Segoe UI",
+        "Segoe UI Emoji",
+        "Apple Color Emoji",
+        "Noto Color Emoji",
+        sans-serif;
 }
+
+
+/* =========================
+   PANTALLA
+========================= */
 
 .screen{
     width:100vw;
     height:100vh;
+
     display:flex;
     flex-direction:column;
 }
 
-/* CABECERA */
+
+/* =========================
+   CABECERA
+========================= */
 
 .header{
     height:10vh;
     min-height:82px;
+
     flex-shrink:0;
 
     display:flex;
@@ -47,42 +66,62 @@ html, body{
     padding:0 3vw;
 
     background:#ffffff;
-    border-bottom:1px solid #e4e9ef;
+
+    border-bottom:
+        1px solid #e4e9ef;
 }
+
 
 .brand h1{
     margin:0;
+
     font-size:2vw;
+
     font-weight:700;
+
     color:#174c87;
 }
 
+
 .brand p{
     margin:5px 0 0;
+
     font-size:1vw;
+
     color:#67798c;
 }
 
+
 .facebook-title{
     font-size:1.35vw;
+
     font-weight:bold;
+
     color:#1877f2;
 }
 
-/* CUERPO */
+
+/* =========================
+   CONTENIDO PRINCIPAL
+========================= */
 
 .post{
     flex:1;
+
     width:100%;
-    height:90vh;
 
     display:grid;
-    grid-template-columns:45% 55%;
+
+    grid-template-columns:
+        45% 55%;
 
     overflow:hidden;
 }
 
-/* IMAGEN */
+
+/* =========================
+   IMAGEN
+========================= */
 
 .image-area{
     width:100%;
@@ -92,10 +131,11 @@ html, body{
 
     display:flex;
     align-items:center;
-    justify-content:center;
+    justify-content:flex-start;
 
     overflow:hidden;
 }
+
 
 .image-area img{
     width:100%;
@@ -106,10 +146,14 @@ html, body{
 
     display:block;
 
-    transition:opacity .4s ease;
+    transition:
+        opacity .4s ease;
 }
 
-/* PANEL DERECHO */
+
+/* =========================
+   PANEL DERECHO
+========================= */
 
 .info{
     width:100%;
@@ -117,7 +161,8 @@ html, body{
 
     background:#ffffff;
 
-    padding:2.5vw 3vw;
+    padding:
+        2.3vw 2.8vw;
 
     display:flex;
     flex-direction:column;
@@ -125,13 +170,21 @@ html, body{
     overflow:hidden;
 }
 
-/* PERFIL */
+
+/* =========================
+   PERFIL
+========================= */
 
 .profile{
     display:flex;
+
     align-items:center;
+
     gap:15px;
+
+    flex-shrink:0;
 }
+
 
 .avatar{
     width:58px;
@@ -141,85 +194,131 @@ html, body{
 
     border-radius:50%;
 
-    background:#174c87;
-    color:#ffffff;
+    overflow:hidden;
+
+    background:#ffffff;
+
+    border:2px solid #e6edf5;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
-
-    font-size:18px;
-    font-weight:bold;
 }
+
+
+.avatar img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+}
+
 
 .page-name{
     font-size:1.2vw;
+
     font-weight:bold;
+
     color:#174c87;
 }
 
+
 .date{
     margin-top:4px;
+
     font-size:.85vw;
+
     color:#8996a5;
 }
 
-/* DESCRIPCIÓN */
+
+/* =========================
+   DESCRIPCIÓN
+========================= */
 
 .description{
     margin-top:3vh;
 
     flex:1;
 
-    font-size:1.32vw;
+    font-size:1.35vw;
+
     line-height:1.5;
 
     color:#27394c;
 
     white-space:pre-wrap;
+
     overflow:hidden;
 
-    padding-right:.5vw;
+    padding-right:.4vw;
 }
 
-/* INTERACCIONES */
+
+/* =========================
+   INTERACCIONES
+========================= */
 
 .stats{
     margin-top:2vh;
+
     padding:20px 0;
 
     display:grid;
-    grid-template-columns:repeat(3,1fr);
 
-    border-top:1px solid #e5eaf0;
-    border-bottom:1px solid #e5eaf0;
+    grid-template-columns:
+        repeat(3,1fr);
+
+    border-top:
+        1px solid #e5eaf0;
+
+    border-bottom:
+        1px solid #e5eaf0;
+
+    flex-shrink:0;
 }
+
 
 .stat{
     text-align:center;
 }
 
+
 .stat-number{
     font-size:1.65vw;
+
     font-weight:bold;
+
     color:#174c87;
 }
 
+
 .stat-label{
     margin-top:6px;
+
     font-size:.82vw;
+
     color:#7d8996;
 }
 
-/* PARTE INFERIOR */
+
+/* =========================
+   PARTE INFERIOR
+========================= */
 
 .bottom{
     margin-top:2vh;
+
     flex-shrink:0;
 }
 
+
 .progress{
     width:100%;
+
     height:5px;
 
     margin-bottom:18px;
@@ -227,56 +326,72 @@ html, body{
     background:#e4e9ef;
 
     border-radius:10px;
+
     overflow:hidden;
 }
+
 
 .progress-bar{
     width:0%;
     height:100%;
+
     background:#1877f2;
 }
+
 
 .footer{
     display:grid;
-    grid-template-columns:1fr auto 1fr;
+
+    grid-template-columns:
+        1fr auto;
 
     align-items:center;
+
     gap:15px;
 }
 
+
 .link{
     color:#1877f2;
+
     font-size:.9vw;
+
     font-weight:bold;
+
     text-decoration:none;
+
     justify-self:start;
 }
 
-.counter{
-    color:#8794a2;
-    font-size:.88vw;
-    justify-self:center;
-}
 
 .follow{
     background:#1877f2;
+
     color:#ffffff;
 
-    padding:11px 20px;
+    padding:
+        11px 20px;
 
     border-radius:24px;
 
     font-size:.9vw;
+
     font-weight:bold;
 
     justify-self:end;
 }
+
+
+/* =========================
+   ERROR
+========================= */
 
 .error{
     width:100vw;
     height:100vh;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
@@ -285,136 +400,209 @@ html, body{
     text-align:center;
 
     font-size:28px;
+
     color:#174c87;
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="screen">
 
+    <!-- CABECERA -->
+
     <div class="header">
 
         <div class="brand">
-            <h1>Super Farmacia Virgen de Copacabana</h1>
-            <p>Nuestro compromiso es tu bienestar</p>
+
+            <h1>
+                Super Farmacia Virgen de Copacabana
+            </h1>
+
+            <p>
+                Nuestro compromiso es tu bienestar
+            </p>
+
         </div>
 
+
         <div class="facebook-title">
+
             Facebook · @SuperFarmaciaVC
+
         </div>
 
     </div>
 
+
+    <!-- PUBLICACIÓN -->
+
     <div class="post">
+
 
         <!-- IZQUIERDA: IMAGEN -->
 
         <div class="image-area">
+
             <img
                 id="postImage"
                 src=""
                 alt="Publicación">
+
         </div>
 
-        <!-- DERECHA: DESCRIPCIÓN -->
+
+        <!-- DERECHA: INFORMACIÓN -->
 
         <div class="info">
+
+
+            <!-- PERFIL -->
 
             <div class="profile">
 
                 <div class="avatar">
-                    SF
+
+                    <img
+                        id="avatarImg"
+                        src="posts/avatar_logo.jpg"
+                        alt="Logo Super Farmacia">
+
                 </div>
 
+
                 <div>
+
                     <div class="page-name">
+
                         Super Farmacia Virgen de Copacabana
+
                     </div>
+
 
                     <div
                         class="date"
                         id="postDate">
+
                         Publicación reciente
+
                     </div>
+
                 </div>
 
             </div>
+
+
+            <!-- DESCRIPCIÓN -->
 
             <div
                 class="description"
                 id="postText">
             </div>
 
+
+            <!-- INTERACCIONES -->
+
             <div class="stats">
 
+
                 <div class="stat">
+
                     <div
                         class="stat-number"
                         id="likes">
+
                         —
+
                     </div>
 
                     <div class="stat-label">
+
                         👍 Reacciones
+
                     </div>
+
                 </div>
 
+
                 <div class="stat">
+
                     <div
                         class="stat-number"
                         id="comments">
+
                         —
+
                     </div>
 
                     <div class="stat-label">
+
                         💬 Comentarios
+
                     </div>
+
                 </div>
 
+
                 <div class="stat">
+
                     <div
                         class="stat-number"
                         id="shares">
+
                         —
+
                     </div>
 
                     <div class="stat-label">
+
                         ↗ Compartidos
+
                     </div>
+
                 </div>
 
             </div>
 
+
+            <!-- INFERIOR -->
+
             <div class="bottom">
 
+
                 <div class="progress">
+
                     <div
                         class="progress-bar"
                         id="progressBar">
                     </div>
+
                 </div>
 
+
                 <div class="footer">
+
 
                     <a
                         class="link"
                         id="postLink"
                         href="https://www.facebook.com/SuperFarmaciaVC/"
                         target="_blank">
+
                         Ver publicación
+
                     </a>
 
-                    <div
-                        class="counter"
-                        id="counter">
-                        0 / 0
-                    </div>
 
                     <div class="follow">
+
                         Síguenos en Facebook
+
                     </div>
+
 
                 </div>
 
@@ -426,81 +614,81 @@ html, body{
 
 </div>
 
+
 <script>
 
-/* CONFIGURACIÓN */
+/* =========================
+   CONFIGURACIÓN
+========================= */
 
-const TIEMPO_POR_PUBLICACION = 60000;
-const RECARGAR_JSON = 3600000;
-
-let posts = [];
-let actual = 0;
-let timerPosts = null;
+const RECARGAR_JSON =
+    3600000; // cada hora
 
 
-/* CARGAR POSTS.JSON */
+/* =========================
+   CARGAR POST
+========================= */
 
-async function cargarPosts(){
+async function cargarPost(){
 
     try{
 
-        const respuesta = await fetch(
-            "posts.json?t=" + Date.now(),
-            {
-                cache:"no-store"
-            }
-        );
+        const respuesta =
+            await fetch(
+                "posts.json?t=" +
+                Date.now(),
+                {
+                    cache:"no-store"
+                }
+            );
+
 
         if(!respuesta.ok){
+
             throw new Error(
                 "No se pudo cargar posts.json"
             );
+
         }
+
 
         const datos =
             await respuesta.json();
+
 
         if(
             !Array.isArray(datos)
             ||
             datos.length === 0
         ){
+
             throw new Error(
-                "posts.json no tiene publicaciones"
+                "posts.json está vacío"
             );
-        }
-
-        posts =
-            datos.slice(0,3);
-
-        actual = 0;
-
-        mostrarPost(actual);
-
-        if(timerPosts){
-            clearInterval(timerPosts);
-        }
-
-        if(posts.length > 1){
-
-            timerPosts =
-                setInterval(
-                    siguientePost,
-                    TIEMPO_POR_PUBLICACION
-                );
 
         }
+
+
+        const post =
+            datos[0];
+
+
+        mostrarPost(
+            post
+        );
 
     }
 
     catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
         document.body.innerHTML =
         `
         <div class="error">
-            No se pudieron cargar las publicaciones.
+            No se pudo cargar la publicación.
         </div>
         `;
 
@@ -509,24 +697,24 @@ async function cargarPosts(){
 }
 
 
-/* MOSTRAR POST */
+/* =========================
+   MOSTRAR POST
+========================= */
 
-function mostrarPost(index){
+function mostrarPost(post){
 
-    const post =
-        posts[index];
 
-    if(!post){
-        return;
-    }
+    /* IMAGEN */
 
     const imagen =
         document.getElementById(
             "postImage"
         );
 
+
     imagen.style.opacity =
         "0";
+
 
     setTimeout(()=>{
 
@@ -539,6 +727,21 @@ function mostrarPost(index){
     },200);
 
 
+    /* LOGO */
+
+    const avatar =
+        document.getElementById(
+            "avatarImg"
+        );
+
+
+    avatar.src =
+        post.avatar ||
+        "posts/avatar_logo.jpg";
+
+
+    /* FECHA */
+
     document.getElementById(
         "postDate"
     ).textContent =
@@ -546,17 +749,24 @@ function mostrarPost(index){
         "Publicación reciente";
 
 
+    /* DESCRIPCIÓN */
+
     document.getElementById(
         "postText"
     ).textContent =
         post.text || "";
 
 
+    /* REACCIONES */
+
     document.getElementById(
         "likes"
     ).textContent =
-        post.likes || "—";
+        post.likes ||
+        "—";
 
+
+    /* COMENTARIOS */
 
     document.getElementById(
         "comments"
@@ -565,12 +775,16 @@ function mostrarPost(index){
         "—";
 
 
+    /* COMPARTIDOS */
+
     document.getElementById(
         "shares"
     ).textContent =
         post.shares ||
         "—";
 
+
+    /* LINK */
 
     document.getElementById(
         "postLink"
@@ -579,38 +793,14 @@ function mostrarPost(index){
         "https://www.facebook.com/SuperFarmaciaVC/";
 
 
-    document.getElementById(
-        "counter"
-    ).textContent =
-        (index + 1)
-        + " / "
-        + posts.length;
-
-
     iniciarBarra();
 
 }
 
 
-/* SIGUIENTE PUBLICACIÓN */
-
-function siguientePost(){
-
-    actual++;
-
-    if(
-        actual >=
-        posts.length
-    ){
-        actual = 0;
-    }
-
-    mostrarPost(actual);
-
-}
-
-
-/* BARRA DE TIEMPO */
+/* =========================
+   BARRA
+========================= */
 
 function iniciarBarra(){
 
@@ -619,16 +809,20 @@ function iniciarBarra(){
             "progressBar"
         );
 
+
     barra.style.transition =
         "none";
 
+
     barra.style.width =
         "0%";
+
 
     setTimeout(()=>{
 
         barra.style.transition =
             "width 60s linear";
+
 
         barra.style.width =
             "100%";
@@ -638,15 +832,17 @@ function iniciarBarra(){
 }
 
 
-/* INICIAR */
+/* =========================
+   INICIO
+========================= */
 
-cargarPosts();
+cargarPost();
 
 
-/* REVISAR ACTUALIZACIONES CADA HORA */
+/* Revisa cada hora si cambió el post */
 
 setInterval(
-    cargarPosts,
+    cargarPost,
     RECARGAR_JSON
 );
 
