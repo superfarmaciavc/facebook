@@ -34,7 +34,7 @@ def normalizar_url(href):
     if not any(p in href for p in patrones):
         return None
 
-    # quitar parámetros innecesarios
+    # Quitar parámetros innecesarios
     try:
         if "?" in href and "story_fbid=" not in href:
             href = href.split("?")[0]
@@ -45,114 +45,7 @@ def normalizar_url(href):
 
 
 # =========================================================
-# EXTRAER TIMESTAMP DESDE URL
-# =========================================================
-
-def timestamp_desde_url(url):
-    if not url:
-        return 0
-
-    try:
-        parsed = urlparse(url)
-        qs = parse_qs(parsed.query)
-
-        if "story_fbid" in qs:
-            valor = qs["story_fbid"][0]
-
-            # Facebook IDs grandes pueden contener timestamp parcial,
-            # pero no siempre es confiable.
-            # Por eso solo se usa como fallback.
-            if valor.isdigit():
-                return int(valor[-10:])
-
-    except:
-        pass
-
-    return 0
-
-
-# =========================================================
-# EXTRAER FECHA DE UN ARTÍCULO
-# =========================================================
-
-async def extraer_fecha_articulo(articulo):
-    candidatos = []
-
-    # time tag
-    try:
-        times = articulo.locator("time")
-
-        for i in range(await times.count()):
-            try:
-                dt = await times.nth(i).get_attribute("datetime")
-
-                if dt:
-                    candidatos.append(dt)
-            except:
-                pass
-    except:
-        pass
-
-    # abbr tag
-    try:
-        abbrs = articulo.locator("abbr")
-
-        for i in range(await abbrs.count()):
-            try:
-                data_utime = await abbrs.nth(i).get_attribute("data-utime")
-
-                if data_utime and data_utime.isdigit():
-                    return int(data_utime)
-
-                title = await abbrs.nth(i).get_attribute("title")
-
-                if title:
-                    candidatos.append(title)
-            except:
-                pass
-    except:
-        pass
-
-    # aria-label y title de enlaces
-    try:
-        links = articulo.locator("a")
-
-        for i in range(await links.count()):
-            try:
-                aria = await links.nth(i).get_attribute("aria-label")
-                title = await links.nth(i).get_attribute("title")
-
-                if aria:
-                    candidatos.append(aria)
-
-                if title:
-                    candidatos.append(title)
-            except:
-                pass
-    except:
-        pass
-
-    # intentar timestamp en atributos
-    try:
-        html = await articulo.inner_html()
-
-        matches = re.findall(
-            r'(?:"timestamp"|data-utime)[^0-9]{0,20}([0-9]{10})',
-            html
-        )
-
-        if matches:
-            return max(int(x) for x in matches)
-
-    except:
-        pass
-
-    # si no encontramos timestamp real, retornamos 0
-    return 0
-
-
-# =========================================================
-# DETECTAR SI ESTÁ FIJADA
+# DETECTAR POST FIJADO
 # =========================================================
 
 async def esta_fijada(articulo):
@@ -173,7 +66,64 @@ async def esta_fijada(articulo):
 
 
 # =========================================================
-# BUSCAR POSTS CANDIDATOS
+# EXTRAER TIMESTAMP
+# =========================================================
+
+async def extraer_timestamp_articulo(articulo):
+    # 1. data-utime
+    try:
+        abbrs = articulo.locator("abbr")
+
+        for i in range(await abbrs.count()):
+            try:
+                valor = await abbrs.nth(i).get_attribute("data-utime")
+
+                if valor and valor.isdigit():
+                    return int(valor)
+            except:
+                pass
+    except:
+        pass
+
+    # 2. time datetime
+    try:
+        times = articulo.locator("time")
+
+        for i in range(await times.count()):
+            try:
+                dt = await times.nth(i).get_attribute("datetime")
+
+                if dt:
+                    parsed = datetime.fromisoformat(
+                        dt.replace("Z", "+00:00")
+                    )
+
+                    return int(parsed.timestamp())
+            except:
+                pass
+    except:
+        pass
+
+    # 3. buscar timestamps dentro del HTML
+    try:
+        html = await articulo.inner_html()
+
+        matches = re.findall(
+            r'(?:"timestamp"|data-utime)[^0-9]{0,30}([0-9]{10})',
+            html
+        )
+
+        if matches:
+            return max(int(x) for x in matches)
+
+    except:
+        pass
+
+    return 0
+
+
+# =========================================================
+# OBTENER CANDIDATOS
 # =========================================================
 
 async def obtener_candidatos(page):
@@ -192,6 +142,13 @@ async def obtener_candidatos(page):
             fijada = await esta_fijada(articulo)
         except:
             fijada = False
+
+        try:
+            timestamp = await extraer_timestamp_articulo(
+                articulo
+            )
+        except:
+            timestamp = 0
 
         links = articulo.locator("a")
 
@@ -212,12 +169,10 @@ async def obtener_candidatos(page):
         if not urls:
             continue
 
-        fecha = await extraer_fecha_articulo(articulo)
-
         for url in urls:
             candidatos.append({
                 "url": url,
-                "timestamp": fecha,
+                "timestamp": timestamp,
                 "fijada": fijada,
                 "indice": i
             })
@@ -226,23 +181,23 @@ async def obtener_candidatos(page):
 
 
 # =========================================================
-# ELEGIR MÁS RECIENTE
+# ELEGIR EL MÁS RECIENTE
 # =========================================================
 
 def elegir_mas_reciente(candidatos):
     if not candidatos:
         return None
 
-    # primero descartamos fijadas si hay otras
-    no_fijadas = [
+    # Preferir no fijados
+    no_fijados = [
         c for c in candidatos
         if not c["fijada"]
     ]
 
-    if no_fijadas:
-        candidatos = no_fijadas
+    if no_fijados:
+        candidatos = no_fijados
 
-    # si tenemos timestamps reales
+    # Si existen timestamps válidos
     con_fecha = [
         c for c in candidatos
         if c["timestamp"] > 0
@@ -256,8 +211,7 @@ def elegir_mas_reciente(candidatos):
 
         return con_fecha[0]
 
-    # fallback:
-    # asumimos que Facebook devuelve artículos recientes primero
+    # Fallback: primer artículo visible
     candidatos.sort(
         key=lambda x: x["indice"]
     )
@@ -266,20 +220,66 @@ def elegir_mas_reciente(candidatos):
 
 
 # =========================================================
-# EXPANDIR VER MÁS
+# EXPANDIR "VER MÁS"
 # =========================================================
 
 async def expandir_ver_mas(page):
-    for _ in range(5):
-        encontrado = False
+    await page.wait_for_timeout(2000)
 
+    # Primero intentar dentro del mensaje del post
+    try:
+        mensajes = page.locator(
+            '[data-ad-preview="message"]'
+        )
+
+        cantidad = await mensajes.count()
+
+        print(
+            "Bloques de mensaje encontrados:",
+            cantidad
+        )
+
+        for i in range(cantidad):
+            mensaje = mensajes.nth(i)
+
+            try:
+                botones = mensaje.get_by_text(
+                    re.compile(
+                        r"^\s*(Ver más|See more)\s*$",
+                        re.IGNORECASE
+                    )
+                )
+
+                for j in range(await botones.count()):
+                    boton = botones.nth(j)
+
+                    if await boton.is_visible():
+                        print("Expandiendo descripción...")
+
+                        await boton.click(
+                            force=True,
+                            timeout=5000
+                        )
+
+                        await page.wait_for_timeout(
+                            1500
+                        )
+
+            except:
+                pass
+
+    except:
+        pass
+
+    # Segundo intento global
+    try:
         elementos = page.locator(
-            'div[role="button"], span[role="button"], span, div'
+            'div[role="button"], span[role="button"]'
         )
 
         cantidad = await elementos.count()
 
-        for i in range(min(cantidad, 500)):
+        for i in range(min(cantidad, 300)):
             try:
                 el = elementos.nth(i)
 
@@ -291,19 +291,25 @@ async def expandir_ver_mas(page):
                     "ver más",
                     "see more"
                 ]:
-
                     if await el.is_visible():
-                        await el.evaluate("e => e.click()")
+                        print(
+                            "Expandiendo descripción por método alternativo..."
+                        )
 
-                        await page.wait_for_timeout(1200)
+                        await el.click(
+                            force=True,
+                            timeout=5000
+                        )
 
-                        encontrado = True
+                        await page.wait_for_timeout(
+                            1500
+                        )
 
             except:
                 pass
 
-        if not encontrado:
-            break
+    except:
+        pass
 
 
 # =========================================================
@@ -330,7 +336,8 @@ async def texto_con_emojis(locator):
                         continue;
                     }
 
-                    const tag = child.tagName.toLowerCase();
+                    const tag =
+                        child.tagName.toLowerCase();
 
                     if (tag === "br") {
                         salida += "\\n";
@@ -338,12 +345,25 @@ async def texto_con_emojis(locator):
                     }
 
                     if (tag === "img") {
+
                         salida +=
                             child.getAttribute("alt") ||
                             child.getAttribute("aria-label") ||
                             child.getAttribute("title") ||
                             "";
 
+                        continue;
+                    }
+
+                    const aria =
+                        child.getAttribute("aria-label");
+
+                    if (
+                        aria &&
+                        aria.length <= 30 &&
+                        /[^a-zA-Z0-9\\s]/u.test(aria)
+                    ) {
+                        salida += aria;
                         continue;
                     }
 
@@ -381,8 +401,20 @@ def limpiar_texto(texto):
     if not texto:
         return ""
 
-    texto = texto.replace("... Ver más", "")
-    texto = texto.replace("Ver más", "")
+    texto = texto.replace(
+        "... Ver más",
+        ""
+    )
+
+    texto = texto.replace(
+        "Ver más",
+        ""
+    )
+
+    texto = texto.replace(
+        "See more",
+        ""
+    )
 
     texto = re.sub(
         r"\n{3,}",
@@ -394,34 +426,121 @@ def limpiar_texto(texto):
 
 
 # =========================================================
-# DESCRIPCIÓN
+# OBTENER DESCRIPCIÓN COMPLETA
 # =========================================================
 
 async def obtener_descripcion(page):
+    candidatos = []
+
+    # -----------------------------------------------------
+    # MÉTODO 1: data-ad-preview="message"
+    # -----------------------------------------------------
+
     try:
         mensajes = page.locator(
             '[data-ad-preview="message"]'
         )
 
-        candidatos = []
+        cantidad = await mensajes.count()
 
-        for i in range(await mensajes.count()):
-            texto = await texto_con_emojis(
-                mensajes.nth(i)
-            )
+        print(
+            "Mensajes encontrados:",
+            cantidad
+        )
 
-            if texto:
-                candidatos.append(texto)
+        for i in range(cantidad):
+            try:
+                texto = await texto_con_emojis(
+                    mensajes.nth(i)
+                )
 
-        if candidatos:
-            return limpiar_texto(
-                max(candidatos, key=len)
-            )
+                texto = limpiar_texto(
+                    texto
+                )
+
+                if texto:
+                    candidatos.append(texto)
+
+            except:
+                pass
 
     except:
         pass
 
-    # fallback
+    # -----------------------------------------------------
+    # MÉTODO 2: bloques dir="auto"
+    # -----------------------------------------------------
+
+    try:
+        bloques = page.locator(
+            'div[dir="auto"]'
+        )
+
+        cantidad = await bloques.count()
+
+        for i in range(
+            min(cantidad, 300)
+        ):
+            try:
+                texto = await texto_con_emojis(
+                    bloques.nth(i)
+                )
+
+                texto = limpiar_texto(
+                    texto
+                )
+
+                if len(texto) < 30:
+                    continue
+
+                texto_lower = texto.lower()
+
+                basura = [
+                    "iniciar sesión",
+                    "crear cuenta",
+                    "me gusta",
+                    "comentar",
+                    "compartir",
+                    "todas las reacciones",
+                    "más relevantes"
+                ]
+
+                if any(
+                    x in texto_lower
+                    for x in basura
+                ):
+                    continue
+
+                candidatos.append(texto)
+
+            except:
+                pass
+
+    except:
+        pass
+
+    # -----------------------------------------------------
+    # DEVOLVER EL TEXTO MÁS LARGO
+    # -----------------------------------------------------
+
+    if candidatos:
+        descripcion = max(
+            candidatos,
+            key=len
+        )
+
+        print(
+            "Descripción seleccionada:"
+        )
+
+        print(descripcion)
+
+        return descripcion
+
+    # -----------------------------------------------------
+    # FALLBACK: OG DESCRIPTION
+    # -----------------------------------------------------
+
     try:
         meta = page.locator(
             'meta[property="og:description"]'
@@ -433,7 +552,13 @@ async def obtener_descripcion(page):
             )
 
             if texto:
-                return limpiar_texto(texto)
+                print(
+                    "Usando og:description como último recurso."
+                )
+
+                return limpiar_texto(
+                    texto
+                )
 
     except:
         pass
@@ -482,26 +607,26 @@ async def obtener_mejor_imagen(page):
 
                 if (srcset) {
 
-                    for (const item of srcset.split(",")) {
+                    srcset
+                    .split(",")
+                    .forEach(item => {
 
                         const partes =
                             item.trim().split(/\\s+/);
-
-                        const url =
-                            partes[0];
 
                         const size =
                             parseInt(partes[1]) || 0;
 
                         opciones.push({
-                            url: url,
+                            url: partes[0],
                             score: size * size
                         });
-                    }
+                    });
                 }
 
                 opciones.sort(
-                    (a,b) => b.score - a.score
+                    (a,b) =>
+                    b.score - a.score
                 );
 
                 return {
@@ -529,8 +654,7 @@ async def obtener_mejor_imagen(page):
                 continue
 
             area = (
-                datos["width"]
-                *
+                datos["width"] *
                 datos["height"]
             )
 
@@ -550,6 +674,10 @@ async def obtener_mejor_imagen(page):
             reverse=True
         )
 
+        print(
+            "Imagen principal encontrada."
+        )
+
         return candidatos[0][1]
 
     # fallback og:image
@@ -565,6 +693,7 @@ async def obtener_mejor_imagen(page):
 
             if src:
                 return src
+
     except:
         pass
 
@@ -587,7 +716,9 @@ async def descargar_imagen(context, url):
     ruta = "posts/ultima_publicacion.jpg"
 
     try:
-        respuesta = await context.request.get(url)
+        respuesta = await context.request.get(
+            url
+        )
 
         if respuesta.ok:
             contenido = await respuesta.body()
@@ -596,7 +727,9 @@ async def descargar_imagen(context, url):
                 ruta,
                 "wb"
             ) as archivo:
-                archivo.write(contenido)
+                archivo.write(
+                    contenido
+                )
 
             print(
                 "Imagen guardada:",
@@ -639,6 +772,30 @@ async def obtener_metricas(page):
         ).inner_text()
     except:
         texto = ""
+
+    try:
+        aria = await page.locator(
+            "[aria-label]"
+        ).evaluate_all("""
+        elementos =>
+            elementos
+            .map(
+                x =>
+                x.getAttribute(
+                    "aria-label"
+                )
+            )
+            .filter(Boolean)
+            .join("\\n")
+        """)
+
+        texto += (
+            "\\n" +
+            aria
+        )
+
+    except:
+        pass
 
     likes = extraer_numero(
         texto,
@@ -702,9 +859,15 @@ async def main():
             )
         )
 
+        # =================================================
+        # ABRIR PÁGINA DE FACEBOOK
+        # =================================================
+
         page = await context.new_page()
 
-        print("Abriendo Facebook...")
+        print(
+            "Abriendo Facebook..."
+        )
 
         await page.goto(
             FACEBOOK_URL,
@@ -712,10 +875,13 @@ async def main():
             timeout=90000
         )
 
-        await page.wait_for_timeout(10000)
+        await page.wait_for_timeout(
+            10000
+        )
 
-        # hacer pequeños scrolls para que cargue publicaciones
+        # cargar algunos posts
         for _ in range(4):
+
             await page.mouse.wheel(
                 0,
                 1000
@@ -725,6 +891,7 @@ async def main():
                 1500
             )
 
+        # regresar arriba
         await page.mouse.wheel(
             0,
             -5000
@@ -748,11 +915,13 @@ async def main():
         )
 
         if not elegido:
+
             print(
-                "No se encontró ninguna publicación."
+                "No se encontró publicación."
             )
 
             await browser.close()
+
             return
 
         post_url = elegido["url"]
@@ -769,11 +938,15 @@ async def main():
 
         await page.close()
 
-        # =====================================================
-        # ABRIR PUBLICACIÓN INDIVIDUAL
-        # =====================================================
+        # =================================================
+        # ABRIR POST INDIVIDUAL
+        # =================================================
 
         post_page = await context.new_page()
+
+        print(
+            "Abriendo publicación individual..."
+        )
 
         await post_page.goto(
             post_url,
@@ -785,23 +958,41 @@ async def main():
             8000
         )
 
+        # =================================================
+        # EXPANDIR TEXTO
+        # =================================================
+
         await expandir_ver_mas(
             post_page
         )
 
         await post_page.wait_for_timeout(
-            1500
+            2000
         )
+
+        # =================================================
+        # DESCRIPCIÓN
+        # =================================================
 
         descripcion = await obtener_descripcion(
             post_page
         )
 
-        likes, comentarios, compartidos = (
-            await obtener_metricas(
-                post_page
-            )
+        # =================================================
+        # MÉTRICAS
+        # =================================================
+
+        (
+            likes,
+            comentarios,
+            compartidos
+        ) = await obtener_metricas(
+            post_page
         )
+
+        # =================================================
+        # IMAGEN
+        # =================================================
 
         imagen_url = await obtener_mejor_imagen(
             post_page
@@ -810,34 +1001,67 @@ async def main():
         imagen_final = ""
 
         if imagen_url:
+
             imagen_final = await descargar_imagen(
                 context,
                 imagen_url
             )
 
-        # si es Reel y no hay texto, dejamos al menos algo
+        # =================================================
+        # FALLBACK DE TEXTO
+        # =================================================
+
         if not descripcion:
 
-            if "/reel/" in post_url or "/reels/" in post_url:
-                descripcion = "Reel reciente de Super Farmacia"
+            if (
+                "/reel/" in post_url
+                or
+                "/reels/" in post_url
+            ):
+                descripcion = (
+                    "Reel reciente de Super Farmacia"
+                )
+
             else:
-                descripcion = "Publicación reciente de Super Farmacia"
+                descripcion = (
+                    "Publicación reciente de Super Farmacia"
+                )
 
         await post_page.close()
+
         await browser.close()
+
+        # =================================================
+        # GUARDAR JSON
+        # =================================================
 
         resultado = [
             {
-                "text": descripcion,
-                "image": imagen_final,
-                "url": post_url,
-                "date": "Publicación reciente",
-                "likes": likes,
-                "comments_count": comentarios,
-                "shares": compartidos,
-                "scraped_at": datetime.now(
-                    timezone.utc
-                ).isoformat()
+                "text":
+                    descripcion,
+
+                "image":
+                    imagen_final,
+
+                "url":
+                    post_url,
+
+                "date":
+                    "Publicación reciente",
+
+                "likes":
+                    likes,
+
+                "comments_count":
+                    comentarios,
+
+                "shares":
+                    compartidos,
+
+                "scraped_at":
+                    datetime.now(
+                        timezone.utc
+                    ).isoformat()
             }
         ]
 
