@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -10,6 +11,7 @@
     >
 
     <title>Super Farmacia - Facebook</title>
+
 
     <style>
 
@@ -21,10 +23,8 @@
         body{
             margin:0;
             padding:0;
-
             width:100%;
             height:100%;
-
             overflow:hidden;
 
             font-family:
@@ -35,10 +35,6 @@
             background:#ffffff;
         }
 
-
-        /* =====================================
-           BODY
-        ====================================== */
 
         body{
             display:flex;
@@ -52,8 +48,8 @@
         ====================================== */
 
         .header{
-            width:100%;
 
+            width:100%;
             flex:0 0 80px;
 
             margin:0;
@@ -88,8 +84,8 @@
         ====================================== */
 
         .screen{
-            width:100%;
 
+            width:100%;
             flex:1;
             min-height:0;
 
@@ -104,10 +100,11 @@
 
 
         /* =====================================
-           IMAGEN IZQUIERDA
+           FOTO / VIDEO
         ====================================== */
 
-        .image-area{
+        .media-area{
+
             width:45%;
             height:100%;
 
@@ -116,7 +113,7 @@
 
             overflow:hidden;
 
-            background:#eeeeee;
+            background:#000000;
 
             display:flex;
             align-items:center;
@@ -124,7 +121,9 @@
         }
 
 
-        .image-area img{
+        .media-area img,
+        .media-area video{
+
             width:100%;
             height:100%;
 
@@ -138,12 +137,19 @@
         }
 
 
+        #postVideo{
+            display:none;
+            background:#000000;
+        }
+
+
 
         /* =====================================
            INFORMACIÓN DERECHA
         ====================================== */
 
         .info{
+
             width:55%;
             height:100%;
 
@@ -168,18 +174,20 @@
         ====================================== */
 
         .profile{
+
             display:flex;
             align-items:center;
 
             gap:15px;
 
-            flex-shrink:0;
-
             margin-bottom:20px;
+
+            flex-shrink:0;
         }
 
 
         .avatar{
+
             width:58px;
             height:58px;
 
@@ -200,6 +208,7 @@
 
 
         .profile-data{
+
             display:flex;
             flex-direction:column;
 
@@ -208,6 +217,7 @@
 
 
         .page-name{
+
             color:#0f172a;
 
             font-size:23px;
@@ -218,6 +228,7 @@
 
 
         .date{
+
             margin-top:4px;
 
             color:#65676b;
@@ -232,17 +243,17 @@
         ====================================== */
 
         .description-wrap{
+
             flex:1;
 
             min-height:0;
-
-            display:flex;
 
             overflow:hidden;
         }
 
 
         .description{
+
             width:100%;
             height:100%;
 
@@ -266,13 +277,15 @@
         ====================================== */
 
         .stats{
+
             flex-shrink:0;
 
             min-height:64px;
 
             margin-top:16px;
 
-            border-top:1px solid #dadde1;
+            border-top:
+                1px solid #dadde1;
 
             display:flex;
             align-items:center;
@@ -284,9 +297,9 @@
         }
 
 
-        /* REACCIONES */
 
         .reactions{
+
             display:flex;
             align-items:center;
 
@@ -295,6 +308,7 @@
 
 
         .reaction-circle{
+
             width:26px;
             height:26px;
 
@@ -302,28 +316,29 @@
 
             background:#1877f2;
 
+            color:#ffffff;
+
             display:flex;
             align-items:center;
             justify-content:center;
 
             font-size:15px;
 
-            color:white;
-
-            border:2px solid white;
+            border:2px solid #ffffff;
         }
 
 
         .reaction-number{
-            font-size:16px;
+
             color:#65676b;
+
+            font-size:16px;
         }
 
 
 
-        /* COMENTARIOS Y COMPARTIDOS */
-
         .stats-right{
+
             display:flex;
             align-items:center;
 
@@ -332,6 +347,7 @@
 
 
         .fb-stat{
+
             display:flex;
             align-items:center;
 
@@ -344,18 +360,18 @@
 
 
         .fb-stat-icon{
+
             width:20px;
             height:20px;
 
             display:flex;
             align-items:center;
             justify-content:center;
-
-            color:#65676b;
         }
 
 
         .fb-stat svg{
+
             width:18px;
             height:18px;
 
@@ -373,6 +389,7 @@
         ====================================== */
 
         .loading{
+
             flex:1;
 
             width:100%;
@@ -391,7 +408,7 @@
 
 
         /* =====================================
-           PANTALLAS PEQUEÑAS
+           PANTALLAS MÁS PEQUEÑAS
         ====================================== */
 
         @media(max-width:900px){
@@ -408,7 +425,7 @@
                 font-size:14px;
             }
 
-            .image-area{
+            .media-area{
                 width:43%;
             }
 
@@ -436,6 +453,7 @@
         }
 
     </style>
+
 </head>
 
 
@@ -486,16 +504,28 @@
 
 
     <!-- =====================================
-         IMAGEN
+         FOTO / VIDEO
     ====================================== -->
 
-    <div class="image-area">
+    <div class="media-area">
+
 
         <img
             id="postImage"
             src=""
             alt="Publicación"
         >
+
+
+        <video
+            id="postVideo"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+        ></video>
+
 
     </div>
 
@@ -520,6 +550,7 @@
 
             <div class="profile-data">
 
+
                 <div class="page-name">
                     Super Farmacia Virgen de Copacabana
                 </div>
@@ -531,6 +562,7 @@
                 >
                     Publicación reciente
                 </div>
+
 
             </div>
 
@@ -555,7 +587,7 @@
 
 
         <!-- =====================================
-             MÉTRICAS FACEBOOK
+             MÉTRICAS
         ====================================== -->
 
         <div class="stats">
@@ -565,9 +597,11 @@
 
             <div class="reactions">
 
+
                 <div class="reaction-circle">
                     ♥
                 </div>
+
 
                 <span
                     class="reaction-number"
@@ -575,6 +609,7 @@
                 >
                     —
                 </span>
+
 
             </div>
 
@@ -589,6 +624,7 @@
 
                 <div class="fb-stat">
 
+
                     <span class="fb-stat-icon">
 
                         <svg
@@ -596,10 +632,15 @@
                         >
 
                             <path
-                                d="M21 11.5a8.4 8.4 0 0 1-9 8.5
-                                9.5 9.5 0 0 1-4-.9L3 21l1.4-4
+                                d="
+                                M21 11.5
+                                a8.4 8.4 0 0 1-9 8.5
+                                9.5 9.5 0 0 1-4-.9
+                                L3 21
+                                l1.4-4
                                 A8.3 8.3 0 0 1 3 11.5
-                                a9 9 0 0 1 18 0Z"
+                                a9 9 0 0 1 18 0Z
+                                "
                             />
 
                         </svg>
@@ -611,9 +652,11 @@
                         —
                     </span>
 
+
                     <span>
                         comentarios
                     </span>
+
 
                 </div>
 
@@ -623,6 +666,7 @@
 
                 <div class="fb-stat">
 
+
                     <span class="fb-stat-icon">
 
                         <svg
@@ -630,13 +674,15 @@
                         >
 
                             <path
-                                d="M8 12
-                                16 5
-                                16 9
+                                d="
+                                M8 12
+                                L16 5
+                                V9
                                 C20 9 21 13 21 17
                                 C19 14 17 13 16 13
-                                L16 17
-                                Z"
+                                V17
+                                Z
+                                "
                             />
 
                         </svg>
@@ -648,9 +694,11 @@
                         —
                     </span>
 
+
                     <span>
                         compartidos
                     </span>
+
 
                 </div>
 
@@ -692,12 +740,15 @@ async function cargarPublicacion(){
 
     try{
 
+
         const respuesta =
             await fetch(
 
                 POSTS_JSON
-                + "?t="
-                + Date.now(),
+                +
+                "?t="
+                +
+                Date.now(),
 
                 {
                     cache:"no-store"
@@ -726,7 +777,7 @@ async function cargarPublicacion(){
         ){
 
             throw new Error(
-                "No hay publicaciones"
+                "No existen publicaciones"
             );
 
         }
@@ -737,35 +788,133 @@ async function cargarPublicacion(){
 
 
 
-        /* ===============================
-           IMAGEN
-        =============================== */
-
         const imagen =
             document.getElementById(
                 "postImage"
             );
 
 
-        imagen.src =
-            post.image || "";
+        const video =
+            document.getElementById(
+                "postVideo"
+            );
 
 
 
-        /* ===============================
+        /* =================================
+           VIDEO / REEL
+        ================================= */
+
+        if(
+            post.type === "video"
+            &&
+            post.video
+        ){
+
+            imagen.style.display =
+                "none";
+
+
+            video.style.display =
+                "block";
+
+
+            const nuevaURL =
+                new URL(
+                    post.video,
+                    window.location.href
+                ).href;
+
+
+            if(
+                !video.src
+                ||
+                !video.src.startsWith(
+                    nuevaURL
+                )
+            ){
+
+                video.src =
+                    post.video
+                    +
+                    "?t="
+                    +
+                    Date.now();
+
+
+                video.load();
+
+
+                video.play().catch(
+
+                    error => {
+
+                        console.log(
+                            "No se pudo iniciar automáticamente:",
+                            error
+                        );
+
+                    }
+
+                );
+
+            }
+
+        }
+
+
+
+        /* =================================
+           FOTO
+        ================================= */
+
+        else{
+
+
+            video.pause();
+
+
+            video.removeAttribute(
+                "src"
+            );
+
+
+            video.load();
+
+
+            video.style.display =
+                "none";
+
+
+            imagen.style.display =
+                "block";
+
+
+            imagen.src =
+                post.image
+                ||
+                "";
+
+        }
+
+
+
+        /* =================================
            DESCRIPCIÓN
-        =============================== */
+        ================================= */
 
         document.getElementById(
             "postText"
         ).textContent =
-            post.text || "";
+            post.text
+            ||
+            "";
 
 
 
-        /* ===============================
+        /* =================================
            FECHA
-        =============================== */
+        ================================= */
 
         document.getElementById(
             "postDate"
@@ -776,42 +925,48 @@ async function cargarPublicacion(){
 
 
 
-        /* ===============================
+        /* =================================
            REACCIONES
-        =============================== */
+        ================================= */
 
         document.getElementById(
             "likes"
         ).textContent =
-            post.likes || "—";
+            post.likes
+            ||
+            "—";
 
 
 
-        /* ===============================
+        /* =================================
            COMENTARIOS
-        =============================== */
+        ================================= */
 
         document.getElementById(
             "comments"
         ).textContent =
-            post.comments_count || "—";
+            post.comments_count
+            ||
+            "—";
 
 
 
-        /* ===============================
+        /* =================================
            COMPARTIDOS
-        =============================== */
+        ================================= */
 
         document.getElementById(
             "shares"
         ).textContent =
-            post.shares || "—";
+            post.shares
+            ||
+            "—";
 
 
 
-        /* ===============================
-           MOSTRAR
-        =============================== */
+        /* =================================
+           MOSTRAR PANTALLA
+        ================================= */
 
         document.getElementById(
             "loading"
@@ -833,6 +988,7 @@ async function cargarPublicacion(){
     }
     catch(error){
 
+
         console.error(
             error
         );
@@ -843,6 +999,7 @@ async function cargarPublicacion(){
         ).textContent =
             "No se pudo cargar la publicación.";
 
+
     }
 
 }
@@ -850,10 +1007,11 @@ async function cargarPublicacion(){
 
 
 /* =========================================
-   AJUSTAR DESCRIPCIÓN
+   AJUSTAR TEXTO AUTOMÁTICAMENTE
 ========================================= */
 
 function ajustarDescripcion(){
+
 
     const texto =
         document.getElementById(
@@ -861,29 +1019,76 @@ function ajustarDescripcion(){
         );
 
 
-    let tamaño = 25;
+    let tamaño =
+        25;
 
 
     texto.style.fontSize =
-        tamaño + "px";
+        tamaño
+        +
+        "px";
 
 
     while(
+
         texto.scrollHeight
         >
         texto.clientHeight
+
         &&
+
         tamaño > 16
+
     ){
 
         tamaño--;
 
+
         texto.style.fontSize =
-            tamaño + "px";
+            tamaño
+            +
+            "px";
 
     }
 
 }
+
+
+
+/* =========================================
+   SI EL VIDEO FALLA
+========================================= */
+
+document.getElementById(
+    "postVideo"
+).addEventListener(
+    "error",
+    function(){
+
+        console.log(
+            "El video no pudo reproducirse."
+        );
+
+        const video =
+            document.getElementById(
+                "postVideo"
+            );
+
+        const imagen =
+            document.getElementById(
+                "postImage"
+            );
+
+
+        video.style.display =
+            "none";
+
+
+        imagen.style.display =
+            "block";
+
+    }
+);
 
 
 
@@ -896,7 +1101,7 @@ cargarPublicacion();
 
 
 /* =========================================
-   ACTUALIZACIÓN CADA HORA
+   ACTUALIZAR CADA HORA
 ========================================= */
 
 setInterval(
@@ -910,12 +1115,15 @@ setInterval(
 
 
 /* =========================================
-   AJUSTAR SI CAMBIA RESOLUCIÓN
+   AJUSTE SI CAMBIA LA RESOLUCIÓN
 ========================================= */
 
 window.addEventListener(
+
     "resize",
+
     ajustarDescripcion
+
 );
 
 
