@@ -1,23 +1,47 @@
 import asyncio
 import json
+import os
 import re
 from datetime import datetime, timezone
+from urllib.parse import urljoin
 
 from playwright.async_api import async_playwright
 
 
 FACEBOOK_URL = "https://www.facebook.com/SuperFarmaciaVC/"
+MAX_POSTS = 3
+
+
+def limpiar_url(href):
+    if not href:
+        return None
+
+    if href.startswith("/"):
+        href = urljoin("https://www.facebook.com", href)
+
+    if "facebook.com" not in href:
+        return None
+
+    patrones = [
+        "/posts/",
+        "/photos/",
+        "/videos/",
+        "story_fbid="
+    ]
+
+    if not any(x in href for x in patrones):
+        return None
+
+    # Mantener parámetros en story_fbid
+    if "story_fbid=" not in href:
+        href = href.split("?")[0]
+
+    return href
 
 
 def extraer_numero(texto, patrones):
-
     for patron in patrones:
-
-        match = re.search(
-            patron,
-            texto,
-            re.IGNORECASE
-        )
+        match = re.search(patron, texto, re.IGNORECASE)
 
         if match:
             return match.group(1)
@@ -25,93 +49,146 @@ def extraer_numero(texto, patrones):
     return "—"
 
 
-async def expandir_ver_mas(article):
+async def cerrar_ventanas(page):
+    textos = [
+        "Permitir todas las cookies",
+        "Allow all cookies",
+        "Ahora no",
+        "Not now",
+        "Cerrar"
+    ]
 
-    try:
+    for texto in textos:
+        try:
+            boton = page.get_by_text(texto, exact=True)
 
-        botones = article.get_by_text(
-            "Ver más",
-            exact=True
-        )
+            if await boton.count():
+                await boton.first.click(timeout=1500)
+                await page.wait_for_timeout(500)
+        except:
+            pass
 
-        cantidad = await botones.count()
+
+async def expandir_ver_mas(page):
+    # Intentar varias veces porque puede haber más de un botón
+    for _ in range(4):
+        try:
+            botones = page.get_by_text(
+                re.compile(r"^(Ver más|See more)$", re.I)
+            )
+
+            cantidad = await botones.count()
+
+            if cantidad == 0:
+                break
+
+            for i in range(cantidad):
+                try:
+                    await botones.nth(i).click(timeout=2000)
+                    await page.wait_for_timeout(700)
+                except:
+                    pass
+
+        except:
+            break
+
+
+async def buscar_urls_publicaciones(page):
+    urls = []
+
+    for intento in range(10):
+
+        # Expandir textos visibles
+        await expandir_ver_mas(page)
+
+        links = page.locator("a")
+        cantidad = await links.count()
 
         for i in range(cantidad):
-
             try:
-                await botones.nth(i).click(
-                    timeout=2000
-                )
+                href = await links.nth(i).get_attribute("href")
+                url = limpiar_url(href)
 
-                await asyncio.sleep(0.5)
+                if url and url not in urls:
+                    urls.append(url)
 
             except:
                 pass
 
-    except:
-        pass
+        print(
+            f"Scroll {intento + 1}: "
+            f"{len(urls)} publicaciones encontradas"
+        )
+
+        if len(urls) >= MAX_POSTS:
+            break
+
+        # Scroll progresivo
+        await page.evaluate(
+            "window.scrollBy(0, window.innerHeight * 1.4)"
+        )
+
+        await page.wait_for_timeout(2500)
+
+    return urls[:MAX_POSTS]
 
 
-async def obtener_descripcion(article):
-
-    # Primera opción:
-    # bloque específico del mensaje
-
+async def obtener_descripcion(page):
+    # Primero: selector habitual del mensaje de Facebook
     try:
-
-        mensaje = article.locator(
+        mensajes = page.locator(
             '[data-ad-preview="message"]'
         )
 
-        if await mensaje.count() > 0:
+        if await mensajes.count():
 
-            texto = (
-                await mensaje.first.inner_text()
-            ).strip()
+            textos = []
 
-            if texto:
-                return texto
+            for i in range(await mensajes.count()):
+                try:
+                    txt = (
+                        await mensajes.nth(i).inner_text()
+                    ).strip()
+
+                    if txt:
+                        textos.append(txt)
+                except:
+                    pass
+
+            if textos:
+                return max(textos, key=len)
 
     except:
         pass
 
-
-    # Segunda opción:
-    # buscar bloques de texto razonables
+    # Segundo método
+    candidatos = []
 
     try:
-
-        bloques = article.locator(
-            'div[dir="auto"]'
-        )
-
+        bloques = page.locator('div[dir="auto"]')
         cantidad = await bloques.count()
 
-        candidatos = []
-
         for i in range(cantidad):
-
             try:
-
                 texto = (
                     await bloques.nth(i).inner_text()
                 ).strip()
 
-                if len(texto) < 20:
+                if len(texto) < 30:
                     continue
 
-                ignorar = [
+                basura = [
                     "Super Farmacia Virgen de Copacabana",
-                    "Todas las reacciones:",
+                    "Todas las reacciones",
+                    "Me gusta",
                     "Comentar",
                     "Compartir",
-                    "Enviar",
-                    "Seguir página"
+                    "Seguir"
                 ]
 
                 if any(
-                    x.lower() in texto.lower()
-                    for x in ignorar
+                    b.lower() in texto.lower()
+                    for b in basura
                 ):
                     continue
 
@@ -120,152 +197,184 @@ async def obtener_descripcion(article):
             except:
                 pass
 
-        if candidatos:
-
-            return max(
-                candidatos,
-                key=len
-            )
-
     except:
         pass
+
+    if candidatos:
+        return max(candidatos, key=len)
 
     return ""
 
 
-async def obtener_imagen(article):
+async def obtener_mejor_imagen(page):
+    imagenes = page.locator("img")
 
-    try:
+    candidatas = []
 
-        imagenes = article.locator("img")
+    for i in range(await imagenes.count()):
+        try:
+            datos = await imagenes.nth(i).evaluate("""
+            el => ({
+                src: el.currentSrc || el.src || "",
+                w: el.naturalWidth || 0,
+                h: el.naturalHeight || 0,
+                rw: el.getBoundingClientRect().width || 0,
+                rh: el.getBoundingClientRect().height || 0
+            })
+            """)
 
-        cantidad = await imagenes.count()
+            src = datos["src"]
 
-        candidatas = []
-
-        for i in range(cantidad):
-
-            try:
-
-                datos = await imagenes.nth(i).evaluate("""
-                    el => {
-
-                        let src =
-                            el.currentSrc ||
-                            el.src ||
-                            "";
-
-                        const srcset =
-                            el.getAttribute("srcset");
-
-                        if (srcset) {
-
-                            const opciones =
-                                srcset
-                                .split(",")
-                                .map(x => x.trim())
-                                .map(x => {
-                                    const p = x.split(" ");
-                                    return {
-                                        src: p[0],
-                                        size: parseInt(p[1]) || 0
-                                    };
-                                })
-                                .sort((a,b) => b.size - a.size);
-
-                            if (opciones.length) {
-                                src = opciones[0].src;
-                            }
-                        }
-
-                        return {
-                            src: src,
-                            width:
-                                el.naturalWidth ||
-                                el.width ||
-                                0,
-                            height:
-                                el.naturalHeight ||
-                                el.height ||
-                                0
-                        };
-                    }
-                """)
-
-                src = datos["src"]
-                ancho = datos["width"]
-                alto = datos["height"]
-
-                if not src:
-                    continue
-
-                # excluir logos, avatares e iconos
-                if ancho < 400 or alto < 300:
-                    continue
-
-                area = ancho * alto
-
-                candidatas.append(
-                    (area, src)
-                )
-
-            except:
-                pass
-
-        if not candidatas:
-            return ""
-
-        candidatas.sort(
-            key=lambda x: x[0],
-            reverse=True
-        )
-
-        return candidatas[0][1]
-
-    except:
-        return ""
-
-
-async def obtener_link(article):
-
-    try:
-
-        enlaces = article.locator("a")
-
-        cantidad = await enlaces.count()
-
-        for i in range(cantidad):
-
-            href = await enlaces.nth(i).get_attribute(
-                "href"
-            )
-
-            if not href:
+            if not src:
                 continue
 
-            if (
-                "/posts/" in href
-                or "/photos/" in href
-                or "/videos/" in href
-                or "story_fbid=" in href
-            ):
+            # Evitar avatar, logos e iconos
+            if datos["w"] < 500 or datos["h"] < 350:
+                continue
 
-                if href.startswith("/"):
-                    href = (
-                        "https://www.facebook.com"
-                        + href
-                    )
+            area = datos["w"] * datos["h"]
 
-                return href
+            candidatas.append(
+                (area, src)
+            )
 
-    except:
-        pass
+        except:
+            pass
 
-    return FACEBOOK_URL
+    if not candidatas:
+        return None
+
+    candidatas.sort(
+        key=lambda x: x[0],
+        reverse=True
+    )
+
+    return candidatas[0][1]
+
+
+async def descargar_imagen(context, url, numero):
+    os.makedirs("posts", exist_ok=True)
+
+    ruta = f"posts/post{numero}.jpg"
+
+    try:
+        respuesta = await context.request.get(url)
+
+        if respuesta.ok:
+            contenido = await respuesta.body()
+
+            with open(ruta, "wb") as f:
+                f.write(contenido)
+
+            return ruta
+
+    except Exception as e:
+        print("Error descargando imagen:", e)
+
+    return url
+
+
+async def procesar_publicacion(context, url, numero):
+    page = await context.new_page()
+
+    try:
+        print("Abriendo:", url)
+
+        await page.goto(
+            url,
+            wait_until="domcontentloaded",
+            timeout=90000
+        )
+
+        await page.wait_for_timeout(6000)
+
+        await cerrar_ventanas(page)
+
+        # ESTE ES EL PASO IMPORTANTE
+        await expandir_ver_mas(page)
+
+        await page.wait_for_timeout(1500)
+
+        texto_total = await page.locator(
+            "body"
+        ).inner_text()
+
+        descripcion = await obtener_descripcion(page)
+
+        # Quitar solo residuos de interfaz
+        descripcion = descripcion.replace(
+            "... Ver más", ""
+        ).replace(
+            "Ver más", ""
+        ).strip()
+
+        imagen_url = await obtener_mejor_imagen(page)
+
+        if not descripcion or not imagen_url:
+            print(
+                f"Post {numero}: información incompleta"
+            )
+            return None
+
+        # Guardar la imagen dentro de GitHub
+        imagen_local = await descargar_imagen(
+            context,
+            imagen_url,
+            numero
+        )
+
+        likes = extraer_numero(
+            texto_total,
+            [
+                r"Todas las reacciones:\s*([\d.,KkMm]+)",
+                r"([\d.,KkMm]+)\s+reacciones",
+                r"([\d.,KkMm]+)\s+reacción"
+            ]
+        )
+
+        comentarios = extraer_numero(
+            texto_total,
+            [
+                r"([\d.,KkMm]+)\s+comentarios",
+                r"([\d.,KkMm]+)\s+comentario"
+            ]
+        )
+
+        compartidos = extraer_numero(
+            texto_total,
+            [
+                r"([\d.,KkMm]+)\s+veces compartido",
+                r"([\d.,KkMm]+)\s+compartidos",
+                r"([\d.,KkMm]+)\s+compartido"
+            ]
+        )
+
+        return {
+            "text": descripcion,
+            "image": imagen_local,
+            "url": url,
+            "date": "Publicación reciente",
+            "likes": likes,
+            "comments_count": comentarios,
+            "shares": compartidos,
+            "scraped_at": datetime.now(
+                timezone.utc
+            ).isoformat()
+        }
+
+    except Exception as e:
+        print(
+            f"Error en post {numero}:",
+            e
+        )
+
+        return None
+
+    finally:
+        await page.close()
 
 
 async def main():
-
     async with async_playwright() as p:
 
         browser = await p.chromium.launch(
@@ -277,12 +386,19 @@ async def main():
                 "width": 1920,
                 "height": 1080
             },
-            locale="es-ES"
+            locale="es-ES",
+            user_agent=(
+                "Mozilla/5.0 "
+                "(Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 "
+                "(KHTML, like Gecko) "
+                "Chrome/140.0 Safari/537.36"
+            )
         )
 
         page = await context.new_page()
 
-        print("Abriendo Facebook...")
+        print("Abriendo página principal...")
 
         await page.goto(
             FACEBOOK_URL,
@@ -290,207 +406,44 @@ async def main():
             timeout=90000
         )
 
-        await page.wait_for_timeout(10000)
+        await page.wait_for_timeout(7000)
 
+        await cerrar_ventanas(page)
 
-        # Scroll progresivo para cargar posts
-
-        for _ in range(6):
-
-            await page.mouse.wheel(
-                0,
-                1400
-            )
-
-            await page.wait_for_timeout(
-                1800
-            )
-
-
-        articles = page.locator(
-            '[role="article"]'
+        urls = await buscar_urls_publicaciones(
+            page
         )
 
-        total = await articles.count()
+        await page.close()
 
         print(
-            "Artículos encontrados:",
-            total
+            "URLs encontradas:",
+            len(urls)
         )
 
         posts = []
 
+        for numero, url in enumerate(
+            urls,
+            start=1
+        ):
+            post = await procesar_publicacion(
+                context,
+                url,
+                numero
+            )
 
-        for i in range(total):
-
-            if len(posts) >= 3:
-                break
-
-            article = articles.nth(i)
-
-            try:
-
-                # Expandir descripción
-
-                await expandir_ver_mas(
-                    article
-                )
-
-
-                # Texto completo del artículo
-                # para las métricas
-
-                texto_total = (
-                    await article.inner_text()
-                ).strip()
-
-
-                # Descripción
-
-                descripcion = (
-                    await obtener_descripcion(
-                        article
-                    )
-                )
-
-
-                if not descripcion:
-                    continue
-
-
-                # Limpiar solamente residuos conocidos
-
-                descripcion = descripcion.replace(
-                    "... Ver más",
-                    ""
-                ).replace(
-                    "Ver más",
-                    ""
-                ).strip()
-
-
-                # Imagen
-
-                imagen = (
-                    await obtener_imagen(
-                        article
-                    )
-                )
-
-
-                if not imagen:
-                    continue
-
-
-                # Link
-
-                link = (
-                    await obtener_link(
-                        article
-                    )
-                )
-
-
-                # Reacciones
-
-                likes = extraer_numero(
-                    texto_total,
-                    [
-                        r"Todas las reacciones:\s*([\d.,KkMm]+)",
-                        r"([\d.,KkMm]+)\s+reacciones",
-                        r"([\d.,KkMm]+)\s+Me gusta"
-                    ]
-                )
-
-
-                # Comentarios
-
-                comentarios = extraer_numero(
-                    texto_total,
-                    [
-                        r"([\d.,KkMm]+)\s+comentarios",
-                        r"([\d.,KkMm]+)\s+comentario"
-                    ]
-                )
-
-
-                # Compartidos
-
-                compartidos = extraer_numero(
-                    texto_total,
-                    [
-                        r"([\d.,KkMm]+)\s+veces compartido",
-                        r"([\d.,KkMm]+)\s+compartidos",
-                        r"([\d.,KkMm]+)\s+compartido"
-                    ]
-                )
-
-
-                post = {
-
-                    "text":
-                        descripcion[:2500],
-
-                    "image":
-                        imagen,
-
-                    "url":
-                        link,
-
-                    "date":
-                        "Publicación reciente",
-
-                    "likes":
-                        likes,
-
-                    "comments_count":
-                        comentarios,
-
-                    "shares":
-                        compartidos,
-
-                    "scraped_at":
-                        datetime.now(
-                            timezone.utc
-                        ).isoformat()
-
-                }
-
-
+            if post:
                 posts.append(post)
-
-                print(
-                    f"Publicación {len(posts)} capturada"
-                )
-
-
-            except Exception as e:
-
-                print(
-                    "Error en publicación:",
-                    str(e)
-                )
-
 
         await browser.close()
 
-
-        # Seguridad:
-        # si Facebook no devuelve nada,
-        # conserva posts.json anterior
-
         if not posts:
-
             print(
-                "No se encontraron publicaciones."
+                "No se obtuvieron publicaciones. "
+                "Se conserva posts.json anterior."
             )
-
-            print(
-                "Se mantiene el posts.json anterior."
-            )
-
             return
-
 
         with open(
             "posts.json",
@@ -499,15 +452,14 @@ async def main():
         ) as f:
 
             json.dump(
-                posts,
+                posts[:3],
                 f,
                 ensure_ascii=False,
                 indent=2
             )
 
-
         print(
-            f"posts.json actualizado con {len(posts)} publicaciones"
+            f"LISTO: {len(posts[:3])} publicaciones guardadas."
         )
 
 
