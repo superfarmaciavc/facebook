@@ -3,208 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Facebook - Super Farmacia</title>
 
 <style>
-*{
-    box-sizing:border-box;
+* {
+  box-sizing: border-box;
 }
 
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    font-family:Arial, Helvetica, sans-serif;
-    background:#f4f7fb;
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
 }
 
-.screen{
-    width:100vw;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
+.screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.header{
-    height:11vh;
-    background:white;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 3vw;
-    border-bottom:1px solid #e4e9ef;
+.header {
+  height: 11vh;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3vw;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e9ef;
 }
 
-.brand h1{
-    margin:0;
-    font-size:2vw;
-    color:#174c87;
+.brand h1 {
+  margin: 0;
+  font-size: 2vw;
+  color: #174c87;
 }
 
-.brand p{
-    margin:5px 0 0;
-    color:#66788a;
-    font-size:1.05vw;
+.brand p {
+  margin: 6px 0 0;
+  font-size: 1.05vw;
+  color: #67798c;
 }
 
-.facebook{
-    color:#1877f2;
-    font-size:1.5vw;
-    font-weight:bold;
+.facebook {
+  color: #1877f2;
+  font-size: 1.4vw;
+  font-weight: bold;
 }
 
-.post{
-    flex:1;
-    display:grid;
-    grid-template-columns:60% 40%;
-    height:89vh;
+.post {
+  flex: 1;
+  height: 89vh;
+  display: grid;
+  grid-template-columns: 60% 40%;
 }
 
-/* IMAGEN */
-
-.image-area{
-    background:#111;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
+.image-area {
+  width: 100%;
+  height: 100%;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.image-area img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    transition:opacity .6s ease;
+.image-area img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity .5s ease;
 }
 
-/* INFORMACIÓN */
-
-.info{
-    background:white;
-    padding:2.7vw;
-    display:flex;
-    flex-direction:column;
+.info {
+  background: white;
+  padding: 2.5vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.profile{
-    display:flex;
-    align-items:center;
-    gap:15px;
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.avatar{
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    background:#174c87;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:bold;
-    font-size:18px;
+.avatar {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #174c87;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
 }
 
-.page{
-    font-size:1.25vw;
-    font-weight:bold;
-    color:#174c87;
+.page-name {
+  color: #174c87;
+  font-size: 1.2vw;
+  font-weight: bold;
 }
 
-.date{
-    margin-top:4px;
-    color:#8795a5;
-    font-size:.9vw;
+.date {
+  margin-top: 5px;
+  color: #8996a5;
+  font-size: .85vw;
 }
 
-.text{
-    margin-top:2.5vh;
-    font-size:1.35vw;
-    line-height:1.45;
-    color:#26384a;
+.text {
+  margin-top: 2.4vh;
+  font-size: 1.2vw;
+  line-height: 1.45;
+  color: #27394c;
+  overflow: hidden;
+  max-height: 30vh;
 }
 
-.stats{
-    display:flex;
-    gap:28px;
-    margin-top:3vh;
-    padding:18px 0;
-    border-top:1px solid #e8edf2;
-    border-bottom:1px solid #e8edf2;
-    font-size:1.05vw;
+.stats {
+  display: flex;
+  gap: 30px;
+  margin-top: 2.5vh;
+  padding: 18px 0;
+  border-top: 1px solid #e5eaf0;
+  border-bottom: 1px solid #e5eaf0;
+  color: #526475;
+  font-size: 1vw;
 }
 
-.comments{
-    margin-top:2vh;
+.comments {
+  margin-top: 2vh;
 }
 
-.comments-title{
-    font-size:1.05vw;
-    font-weight:bold;
-    color:#174c87;
-    margin-bottom:12px;
+.comments-title {
+  color: #174c87;
+  font-size: 1vw;
+  font-weight: bold;
+  margin-bottom: 12px;
 }
 
-.comment{
-    background:#f3f6f9;
-    border-radius:14px;
-    padding:12px 15px;
-    margin-bottom:10px;
-    font-size:.9vw;
-    line-height:1.35;
+.comment {
+  padding: 11px 14px;
+  margin-bottom: 9px;
+  border-radius: 12px;
+  background: #f4f6f9;
+  color: #37495a;
+  font-size: .85vw;
+  line-height: 1.35;
 }
 
-.comment strong{
-    color:#174c87;
+.no-comments {
+  color: #8996a5;
+  font-size: .9vw;
 }
 
-.bottom{
-    margin-top:auto;
+.bottom {
+  margin-top: auto;
 }
 
-.progress{
-    width:100%;
-    height:5px;
-    background:#e7edf4;
-    border-radius:10px;
-    overflow:hidden;
-    margin-bottom:18px;
+.progress {
+  width: 100%;
+  height: 5px;
+  background: #e5eaf0;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 17px;
 }
 
-.progress-bar{
-    width:0%;
-    height:100%;
-    background:#1877f2;
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: #1877f2;
 }
 
-.footer-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
 }
 
-.link{
-    color:#1877f2;
-    font-weight:bold;
-    font-size:.95vw;
+.facebook-link {
+  color: #1877f2;
+  font-size: .9vw;
+  font-weight: bold;
+  text-decoration: none;
 }
 
-.counter{
-    color:#7d8997;
-    font-size:.9vw;
+.counter {
+  color: #8794a2;
+  font-size: .85vw;
 }
 
-.follow{
-    background:#1877f2;
-    color:white;
-    padding:11px 20px;
-    border-radius:25px;
-    font-weight:bold;
-    font-size:.95vw;
+.follow {
+  padding: 11px 18px;
+  border-radius: 25px;
+  background: #1877f2;
+  color: white;
+  font-size: .9vw;
+  font-weight: bold;
 }
 
+.error {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #174c87;
+  font-size: 28px;
+  text-align: center;
+  padding: 40px;
+}
 </style>
 </head>
 
@@ -212,338 +230,224 @@ html,body{
 
 <div class="screen">
 
-    <div class="header">
-
-        <div class="brand">
-            <h1>Super Farmacia Virgen de Copacabana</h1>
-            <p>Nuestro compromiso es tu bienestar</p>
-        </div>
-
-        <div class="facebook">
-            Facebook · @SuperFarmaciaVC
-        </div>
-
+  <div class="header">
+    <div class="brand">
+      <h1>Super Farmacia Virgen de Copacabana</h1>
+      <p>Nuestro compromiso es tu bienestar</p>
     </div>
 
+    <div class="facebook">
+      Facebook · @SuperFarmaciaVC
+    </div>
+  </div>
 
-    <div class="post">
+  <div class="post">
 
-        <!-- FOTO -->
-
-        <div class="image-area">
-            <img id="postImage" src="">
-        </div>
-
-
-        <!-- CONTENIDO -->
-
-        <div class="info">
-
-            <div class="profile">
-
-                <div class="avatar">
-                    SF
-                </div>
-
-                <div>
-
-                    <div class="page">
-                        Super Farmacia Virgen de Copacabana
-                    </div>
-
-                    <div class="date" id="postDate">
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="text" id="postText">
-            </div>
-
-
-            <div class="stats">
-
-                <div id="likes"></div>
-
-                <div id="commentsCount"></div>
-
-                <div id="shares"></div>
-
-            </div>
-
-
-            <div class="comments">
-
-                <div class="comments-title">
-                    Comentarios
-                </div>
-
-                <div class="comment" id="comment1"></div>
-
-                <div class="comment" id="comment2"></div>
-
-                <div class="comment" id="comment3"></div>
-
-            </div>
-
-
-            <div class="bottom">
-
-                <div class="progress">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-
-                <div class="footer-row">
-
-                    <div class="link">
-                        facebook.com/SuperFarmaciaVC
-                    </div>
-
-                    <div class="counter" id="counter"></div>
-
-                    <div class="follow">
-                        Síguenos en Facebook
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
+    <div class="image-area">
+      <img id="postImage" src="" alt="Publicación">
     </div>
 
+    <div class="info">
+
+      <div class="profile">
+        <div class="avatar">SF</div>
+
+        <div>
+          <div class="page-name">
+            Super Farmacia Virgen de Copacabana
+          </div>
+
+          <div class="date" id="postDate"></div>
+        </div>
+      </div>
+
+      <div class="text" id="postText"></div>
+
+      <div class="stats">
+        <div id="likes">👍 —</div>
+        <div id="commentsCount">💬 —</div>
+        <div id="shares">↗ —</div>
+      </div>
+
+      <div class="comments">
+        <div class="comments-title">Comentarios</div>
+        <div id="commentsBox"></div>
+      </div>
+
+      <div class="bottom">
+
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="footer">
+
+          <a
+            id="postLink"
+            class="facebook-link"
+            href="https://www.facebook.com/SuperFarmaciaVC/"
+            target="_blank">
+            Ver publicación
+          </a>
+
+          <div class="counter" id="counter"></div>
+
+          <div class="follow">
+            Síguenos en Facebook
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
-
 
 <script>
 
-/*
---------------------------------------------------
-PUBLICACIONES
---------------------------------------------------
+const TIEMPO_POR_POST = 60000;
 
-Por ahora son publicaciones de ejemplo.
-
-Más adelante estas 3 publicaciones pueden venir
-automáticamente desde Meta Graph API.
-*/
-
-const posts = [
-
-{
-    image:
-    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=90",
-
-    date:
-    "Hace 1 día",
-
-    text:
-    "💙 ¡Este Día del Peatón actívate con Super Farmacia Virgen de Copacabana!<br><br>💃 Zumba, degustaciones, testers, premios y muchas sorpresas.",
-
-    likes:
-    "👍 34",
-
-    comments:
-    "💬 8 comentarios",
-
-    shares:
-    "↗ 20 compartidos",
-
-    comment1:
-    "<strong>María:</strong><br>¡Excelente actividad! 👏",
-
-    comment2:
-    "<strong>Carlos:</strong><br>¿A qué hora comienza la actividad?",
-
-    comment3:
-    "<strong>Super Farmacia:</strong><br>Te esperamos desde las 8:45 🙌"
-},
-
-{
-    image:
-    "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=1600&q=90",
-
-    date:
-    "Hace 2 días",
-
-    text:
-    "💊 Cuidar tu salud empieza con pequeños hábitos.<br><br>Encuentra productos, novedades y consejos pensados para tu bienestar.",
-
-    likes:
-    "👍 58",
-
-    comments:
-    "💬 12 comentarios",
-
-    shares:
-    "↗ 16 compartidos",
-
-    comment1:
-    "<strong>Alejandra:</strong><br>Muy buenos consejos 👍",
-
-    comment2:
-    "<strong>Fernando:</strong><br>¿Disponible en todas las sucursales?",
-
-    comment3:
-    "<strong>Super Farmacia:</strong><br>Sí, puedes consultar disponibilidad con nosotros."
-},
-
-{
-    image:
-    "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1600&q=90",
-
-    date:
-    "Hace 3 días",
-
-    text:
-    "💙 Estamos cerca de ti para cuidar lo que más importa.<br><br>Conoce nuestras campañas y actividades para toda la familia.",
-
-    likes:
-    "👍 72",
-
-    comments:
-    "💬 15 comentarios",
-
-    shares:
-    "↗ 25 compartidos",
-
-    comment1:
-    "<strong>Patricia:</strong><br>Excelente iniciativa 👏",
-
-    comment2:
-    "<strong>Luis:</strong><br>Muy buena atención.",
-
-    comment3:
-    "<strong>Super Farmacia:</strong><br>¡Muchas gracias por acompañarnos! 💙"
-}
-
-];
-
-
-/*
---------------------------------------------------
-CONFIGURACIÓN
---------------------------------------------------
-*/
-
-const tiempoPorPublicacion = 60000; // 60 segundos
-
+let posts = [];
 let currentPost = 0;
+let postTimer = null;
 
+async function cargarPosts() {
+  try {
+    const response = await fetch(
+      "posts.json?t=" + Date.now()
+    );
 
-/*
---------------------------------------------------
-MOSTRAR PUBLICACIÓN
---------------------------------------------------
-*/
-
-function showPost(index){
-
-    const post = posts[index];
-
-    document.getElementById("postImage").style.opacity = 0;
-
-    setTimeout(() => {
-
-        document.getElementById("postImage").src = post.image;
-
-        document.getElementById("postDate").innerHTML =
-        post.date;
-
-        document.getElementById("postText").innerHTML =
-        post.text;
-
-        document.getElementById("likes").innerHTML =
-        post.likes;
-
-        document.getElementById("commentsCount").innerHTML =
-        post.comments;
-
-        document.getElementById("shares").innerHTML =
-        post.shares;
-
-        document.getElementById("comment1").innerHTML =
-        post.comment1;
-
-        document.getElementById("comment2").innerHTML =
-        post.comment2;
-
-        document.getElementById("comment3").innerHTML =
-        post.comment3;
-
-        document.getElementById("counter").innerHTML =
-        (index + 1) + " / " + posts.length;
-
-        document.getElementById("postImage").style.opacity = 1;
-
-    },300);
-
-    startProgress();
-
-}
-
-
-/*
---------------------------------------------------
-BARRA DE TIEMPO
---------------------------------------------------
-*/
-
-function startProgress(){
-
-    const bar =
-    document.getElementById("progressBar");
-
-    bar.style.transition = "none";
-    bar.style.width = "0%";
-
-    setTimeout(() => {
-
-        bar.style.transition =
-        "width 60s linear";
-
-        bar.style.width =
-        "100%";
-
-    },100);
-
-}
-
-
-/*
---------------------------------------------------
-SIGUIENTE PUBLICACIÓN
---------------------------------------------------
-*/
-
-function nextPost(){
-
-    currentPost++;
-
-    if(currentPost >= posts.length){
-        currentPost = 0;
+    if (!response.ok) {
+      throw new Error("No se pudo cargar posts.json");
     }
 
-    showPost(currentPost);
+    const data = await response.json();
 
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error("posts.json está vacío");
+    }
+
+    posts = data.slice(0, 3);
+    currentPost = 0;
+
+    mostrarPost(currentPost);
+
+    if (postTimer) {
+      clearInterval(postTimer);
+    }
+
+    postTimer = setInterval(
+      siguientePost,
+      TIEMPO_POR_POST
+    );
+
+  } catch (error) {
+    console.error(error);
+
+    document.body.innerHTML = `
+      <div class="error">
+        No se pudieron cargar las publicaciones.
+      </div>
+    `;
+  }
 }
 
+function mostrarPost(index) {
+  const post = posts[index];
 
-/*
---------------------------------------------------
-INICIO
---------------------------------------------------
-*/
+  const image = document.getElementById("postImage");
+  image.style.opacity = 0;
 
-showPost(currentPost);
+  setTimeout(() => {
+    image.src = post.image || "";
+    image.style.opacity = 1;
+  }, 250);
 
-setInterval(
-    nextPost,
-    tiempoPorPublicacion
-);
+  document.getElementById("postDate").innerText =
+    post.date || "Publicación reciente";
+
+  document.getElementById("postText").innerHTML =
+    formatearTexto(post.text || "");
+
+  document.getElementById("likes").innerText =
+    "👍 " + (post.likes || "—");
+
+  document.getElementById("commentsCount").innerText =
+    "💬 " + (post.comments_count || "—");
+
+  document.getElementById("shares").innerText =
+    "↗ " + (post.shares || "—");
+
+  document.getElementById("postLink").href =
+    post.url || "https://www.facebook.com/SuperFarmaciaVC/";
+
+  document.getElementById("counter").innerText =
+    (index + 1) + " / " + posts.length;
+
+  mostrarComentarios(post.comments || []);
+
+  iniciarBarra();
+}
+
+function siguientePost() {
+  currentPost++;
+
+  if (currentPost >= posts.length) {
+    currentPost = 0;
+  }
+
+  mostrarPost(currentPost);
+}
+
+function mostrarComentarios(comments) {
+  const box = document.getElementById("commentsBox");
+  box.innerHTML = "";
+
+  if (!comments || comments.length === 0) {
+    box.innerHTML = `
+      <div class="no-comments">
+        Sin comentarios disponibles
+      </div>
+    `;
+    return;
+  }
+
+  comments.slice(0, 3).forEach(comment => {
+    const div = document.createElement("div");
+    div.className = "comment";
+
+    if (typeof comment === "string") {
+      div.innerText = comment;
+    } else {
+      div.innerText =
+        (comment.name ? comment.name + ": " : "") +
+        (comment.message || "");
+    }
+
+    box.appendChild(div);
+  });
+}
+
+function iniciarBarra() {
+  const bar = document.getElementById("progressBar");
+
+  bar.style.transition = "none";
+  bar.style.width = "0%";
+
+  setTimeout(() => {
+    bar.style.transition = "width 60s linear";
+    bar.style.width = "100%";
+  }, 100);
+}
+
+function formatearTexto(text) {
+  return text.replace(/\n/g, "<br>");
+}
+
+cargarPosts();
+
+/* Revisa si GitHub actualizó posts.json cada hora */
+setInterval(cargarPosts, 3600000);
 
 </script>
 
