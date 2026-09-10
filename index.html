@@ -22,8 +22,10 @@
         body{
             margin:0;
             padding:0;
+
             width:100%;
             height:100%;
+
             overflow:hidden;
 
             font-family:
@@ -45,92 +47,136 @@
         ====================================== */
 
         .header{
+
             width:100%;
+
             flex:0 0 80px;
 
             background:#1f5a96;
+
             color:#ffffff;
 
             display:flex;
+
             align-items:center;
+
             justify-content:space-between;
 
-            padding:0 3vw;
+            padding:
+                0
+                3vw;
+
         }
+
 
         .header-title{
+
             font-size:26px;
+
             font-weight:700;
+
         }
 
+
         .header-subtitle{
+
             font-size:18px;
+
             font-weight:600;
+
         }
 
 
         /* =====================================
-           CONTENIDO PRINCIPAL
+           CONTENIDO
         ====================================== */
 
         .screen{
+
             width:100%;
+
             flex:1;
+
             min-height:0;
 
             display:flex;
 
             background:#ffffff;
+
         }
 
 
         /* =====================================
-           ÁREA MULTIMEDIA
+           MULTIMEDIA
         ====================================== */
 
         .media-area{
+
             width:45%;
+
             height:100%;
 
             min-width:0;
+
             min-height:0;
 
             overflow:hidden;
 
             display:flex;
+
             align-items:center;
+
             justify-content:center;
 
             background:#ffffff;
+
+            position:relative;
+
         }
+
 
         #postImage,
         #postVideo{
+
             width:100%;
+
             height:100%;
 
             max-width:100%;
+
             max-height:100%;
 
             object-fit:contain;
+
             object-position:center center;
 
             background:#ffffff;
 
-            display:block;
         }
 
+
+        #postImage{
+
+            display:block;
+
+        }
+
+
         #postVideo{
+
             display:none;
+
         }
 
 
         /* =====================================
-           LADO DERECHO
+           INFORMACIÓN
         ====================================== */
 
         .info{
+
             width:55%;
+
             height:100%;
 
             min-height:0;
@@ -142,9 +188,11 @@
                 3vw;
 
             display:flex;
+
             flex-direction:column;
 
             background:#ffffff;
+
         }
 
 
@@ -153,7 +201,9 @@
         ====================================== */
 
         .profile{
+
             display:flex;
+
             align-items:center;
 
             gap:15px;
@@ -161,10 +211,14 @@
             margin-bottom:20px;
 
             flex-shrink:0;
+
         }
 
+
         .avatar{
+
             width:58px;
+
             height:58px;
 
             flex-shrink:0;
@@ -172,38 +226,54 @@
             border-radius:50%;
 
             background:#1f5a96;
+
             color:#ffffff;
 
             display:flex;
+
             align-items:center;
+
             justify-content:center;
 
             font-size:18px;
+
             font-weight:700;
+
         }
 
+
         .profile-data{
+
             display:flex;
+
             flex-direction:column;
 
             min-width:0;
+
         }
 
+
         .page-name{
+
             color:#0f172a;
 
             font-size:23px;
+
             font-weight:700;
 
             line-height:1.2;
+
         }
 
+
         .date{
+
             margin-top:4px;
 
             color:#65676b;
 
             font-size:14px;
+
         }
 
 
@@ -212,13 +282,20 @@
         ====================================== */
 
         .description-wrap{
+
             flex:1;
+
             min-height:0;
+
             overflow:hidden;
+
         }
 
+
         .description{
+
             width:100%;
+
             height:100%;
 
             overflow:hidden;
@@ -228,10 +305,11 @@
             color:#111827;
 
             font-size:25px;
+
             line-height:1.48;
 
-            word-break:normal;
             overflow-wrap:break-word;
+
         }
 
 
@@ -240,79 +318,164 @@
         ====================================== */
 
         .stats{
+
             flex-shrink:0;
 
             margin-top:18px;
+
             padding-top:16px;
 
-            border-top:1px solid #dadde1;
+            border-top:
+                1px
+                solid
+                #dadde1;
 
             display:flex;
+
             align-items:stretch;
+
             justify-content:space-between;
 
             gap:14px;
+
         }
 
+
         .interaction-item{
+
             flex:1;
 
             display:flex;
+
             align-items:center;
 
             gap:13px;
 
-            min-height:72px;
+            min-height:78px;
 
-            padding:12px 16px;
+            padding:
+                13px
+                16px;
 
             border-radius:14px;
 
             background:#f6f7f9;
+
         }
 
+
         .interaction-icon{
-            width:42px;
-            height:42px;
+
+            width:44px;
+
+            height:44px;
 
             flex-shrink:0;
 
             border-radius:50%;
 
             display:flex;
+
             align-items:center;
+
             justify-content:center;
 
-            font-size:19px;
+            font-size:20px;
 
             background:#edf0f4;
+
         }
+
 
         .interaction-icon.like{
+
             background:#e7f0ff;
+
         }
 
+
         .interaction-text{
+
             display:flex;
+
             flex-direction:column;
 
             line-height:1.1;
+
         }
 
+
         .interaction-number{
-            font-size:25px;
+
+            font-size:27px;
+
             font-weight:700;
 
             color:#1c1e21;
+
         }
 
+
         .interaction-label{
+
             margin-top:5px;
 
             font-size:14px;
+
             font-weight:500;
 
             color:#65676b;
+
+        }
+
+
+        /* =====================================
+           INDICADORES DE ROTACIÓN
+        ====================================== */
+
+        .post-indicator{
+
+            position:absolute;
+
+            bottom:14px;
+
+            left:50%;
+
+            transform:
+                translateX(-50%);
+
+            display:flex;
+
+            gap:8px;
+
+            z-index:10;
+
+        }
+
+
+        .dot{
+
+            width:10px;
+
+            height:10px;
+
+            border-radius:50%;
+
+            background:
+                rgba(
+                    31,
+                    90,
+                    150,
+                    0.25
+                );
+
+        }
+
+
+        .dot.active{
+
+            background:#1f5a96;
+
         }
 
 
@@ -321,12 +484,15 @@
         ====================================== */
 
         .loading{
+
             flex:1;
 
             width:100%;
 
             display:flex;
+
             align-items:center;
+
             justify-content:center;
 
             background:#ffffff;
@@ -334,32 +500,48 @@
             color:#1f5a96;
 
             font-size:26px;
+
         }
 
 
         /* =====================================
-           PANTALLAS PEQUEÑAS
+           RESPONSIVE
         ====================================== */
 
-        @media(max-width:900px){
+        @media(
+            max-width:900px
+        ){
 
             .header{
+
                 flex-basis:70px;
+
             }
+
 
             .header-title{
+
                 font-size:20px;
+
             }
+
 
             .header-subtitle{
+
                 font-size:14px;
+
             }
+
 
             .media-area{
+
                 width:43%;
+
             }
 
+
             .info{
+
                 width:57%;
 
                 padding:
@@ -367,34 +549,59 @@
                     2.5vw
                     16px
                     2.5vw;
+
             }
+
 
             .page-name{
+
                 font-size:19px;
+
             }
+
 
             .description{
+
                 font-size:20px;
+
             }
+
 
             .interaction-item{
-                min-height:64px;
-                padding:10px 12px;
+
+                min-height:66px;
+
+                padding:
+                    10px
+                    12px;
+
             }
+
 
             .interaction-icon{
-                width:36px;
-                height:36px;
+
+                width:38px;
+
+                height:38px;
+
                 font-size:17px;
+
             }
+
 
             .interaction-number{
-                font-size:21px;
+
+                font-size:22px;
+
             }
 
+
             .interaction-label{
+
                 font-size:12px;
+
             }
+
         }
 
     </style>
@@ -412,11 +619,16 @@
 <header class="header">
 
     <div class="header-title">
+
         Super Farmacia Virgen de Copacabana
+
     </div>
 
+
     <div class="header-subtitle">
+
         Nuestro compromiso es tu bienestar
+
     </div>
 
 </header>
@@ -430,12 +642,14 @@
     id="loading"
     class="loading"
 >
-    Cargando publicación...
+
+    Cargando publicaciones...
+
 </div>
 
 
 <!-- =====================================
-     CONTENIDO
+     PANTALLA
 ====================================== -->
 
 <div
@@ -445,12 +659,12 @@
 >
 
 
-    <!-- FOTO / VIDEO -->
+    <!-- =================================
+         MULTIMEDIA
+    ================================== -->
 
-    <div
-        class="media-area"
-        id="mediaArea"
-    >
+    <div class="media-area">
+
 
         <img
             id="postImage"
@@ -458,19 +672,28 @@
             alt="Publicación"
         >
 
+
         <video
             id="postVideo"
             autoplay
             muted
-            loop
             playsinline
             preload="auto"
         ></video>
 
+
+        <div
+            id="postIndicator"
+            class="post-indicator"
+        ></div>
+
+
     </div>
 
 
-    <!-- INFORMACIÓN -->
+    <!-- =================================
+         INFORMACIÓN
+    ================================== -->
 
     <div class="info">
 
@@ -479,24 +702,36 @@
 
         <div class="profile">
 
+
             <div class="avatar">
+
                 SF
+
             </div>
+
 
             <div class="profile-data">
 
+
                 <div class="page-name">
+
                     Super Farmacia Virgen de Copacabana
+
                 </div>
+
 
                 <div
                     class="date"
                     id="postDate"
                 >
+
                     Publicación reciente
+
                 </div>
 
+
             </div>
+
 
         </div>
 
@@ -505,10 +740,12 @@
 
         <div class="description-wrap">
 
+
             <div
                 class="description"
                 id="postText"
             ></div>
+
 
         </div>
 
@@ -520,72 +757,108 @@
 
             <div class="interaction-item">
 
+
                 <div class="interaction-icon like">
+
                     👍
+
                 </div>
 
+
                 <div class="interaction-text">
+
 
                     <span
                         class="interaction-number"
                         id="likes"
                     >
+
                         —
+
                     </span>
+
 
                     <span class="interaction-label">
+
                         Me gusta
+
                     </span>
 
+
                 </div>
+
 
             </div>
 
 
             <div class="interaction-item">
 
+
                 <div class="interaction-icon">
+
                     💬
+
                 </div>
 
+
                 <div class="interaction-text">
+
 
                     <span
                         class="interaction-number"
                         id="comments"
                     >
+
                         —
+
                     </span>
+
 
                     <span class="interaction-label">
+
                         Comentarios
+
                     </span>
 
+
                 </div>
+
 
             </div>
 
 
             <div class="interaction-item">
 
+
                 <div class="interaction-icon">
+
                     ↗
+
                 </div>
 
+
                 <div class="interaction-text">
+
 
                     <span
                         class="interaction-number"
                         id="shares"
                     >
+
                         —
+
                     </span>
+
 
                     <span class="interaction-label">
+
                         Compartidos
+
                     </span>
 
+
                 </div>
+
 
             </div>
 
@@ -595,41 +868,132 @@
 
     </div>
 
+
 </div>
 
 
 <script>
 
 
-/* =========================================
+/* =========================================================
    CONFIGURACIÓN
-========================================= */
+========================================================= */
 
 const POSTS_JSON =
     "posts.json";
 
-const ACTUALIZACION_MS =
+
+const TIEMPO_IMAGEN =
+    20000;
+
+
+/*
+    Seguridad para videos.
+
+    Si por algún motivo el evento "ended"
+    no se dispara, cambia de post después
+    de 60 segundos.
+*/
+
+const TIEMPO_MAX_VIDEO =
+    60000;
+
+
+/*
+    Cada hora vuelve a leer posts.json
+*/
+
+const ACTUALIZAR_JSON =
     60 * 60 * 1000;
 
 
-/* =========================================
-   CARGAR PUBLICACIÓN
-========================================= */
+/* =========================================================
+   VARIABLES
+========================================================= */
 
-async function cargarPublicacion(){
+let posts = [];
+
+let indiceActual = 0;
+
+let temporizador = null;
+
+let temporizadorVideo = null;
+
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const imagen =
+    document.getElementById(
+        "postImage"
+    );
+
+
+const video =
+    document.getElementById(
+        "postVideo"
+    );
+
+
+const texto =
+    document.getElementById(
+        "postText"
+    );
+
+
+const likes =
+    document.getElementById(
+        "likes"
+    );
+
+
+const comments =
+    document.getElementById(
+        "comments"
+    );
+
+
+const shares =
+    document.getElementById(
+        "shares"
+    );
+
+
+const fecha =
+    document.getElementById(
+        "postDate"
+    );
+
+
+const indicador =
+    document.getElementById(
+        "postIndicator"
+    );
+
+
+/* =========================================================
+   CARGAR POSTS
+========================================================= */
+
+async function cargarPosts(){
 
     try{
 
+
         const respuesta =
             await fetch(
+
                 POSTS_JSON
                 +
                 "?t="
                 +
                 Date.now(),
+
                 {
                     cache:"no-store"
                 }
+
             );
 
 
@@ -642,188 +1006,31 @@ async function cargarPublicacion(){
         }
 
 
-        const posts =
+        const datos =
             await respuesta.json();
 
 
         if(
-            !Array.isArray(posts)
+            !Array.isArray(datos)
             ||
-            posts.length === 0
+            datos.length === 0
         ){
 
             throw new Error(
-                "No existen publicaciones"
+                "No hay publicaciones"
             );
 
         }
 
 
-        const post =
-            posts[0];
+        posts = datos;
 
 
-        const imagen =
-            document.getElementById(
-                "postImage"
-            );
+        indiceActual = 0;
 
 
-        const video =
-            document.getElementById(
-                "postVideo"
-            );
+        crearIndicadores();
 
-
-        /* =================================
-           VIDEO / REEL
-        ================================= */
-
-        if(
-            post.type === "video"
-            &&
-            post.video
-        ){
-
-            imagen.style.display =
-                "none";
-
-
-            video.style.display =
-                "block";
-
-
-            video.style.objectFit =
-                "contain";
-
-
-            video.style.background =
-                "#ffffff";
-
-
-            video.src =
-                post.video
-                +
-                "?t="
-                +
-                Date.now();
-
-
-            video.load();
-
-
-            video.play().catch(
-
-                error => {
-
-                    console.log(
-                        "Autoplay:",
-                        error
-                    );
-
-                }
-
-            );
-
-        }
-
-
-        /* =================================
-           IMAGEN
-        ================================= */
-
-        else{
-
-            video.pause();
-
-
-            video.removeAttribute(
-                "src"
-            );
-
-
-            video.load();
-
-
-            video.style.display =
-                "none";
-
-
-            imagen.style.display =
-                "block";
-
-
-            imagen.style.objectFit =
-                "contain";
-
-
-            imagen.style.background =
-                "#ffffff";
-
-
-            imagen.src =
-                post.image
-                ||
-                "";
-
-        }
-
-
-        /* =================================
-           TEXTO
-        ================================= */
-
-        document.getElementById(
-            "postText"
-        ).textContent =
-            post.text
-            ||
-            "";
-
-
-        /* =================================
-           FECHA
-        ================================= */
-
-        document.getElementById(
-            "postDate"
-        ).textContent =
-            post.date
-            ||
-            "Publicación reciente";
-
-
-        /* =================================
-           INTERACCIONES
-        ================================= */
-
-        document.getElementById(
-            "likes"
-        ).textContent =
-            post.likes
-            ||
-            "—";
-
-
-        document.getElementById(
-            "comments"
-        ).textContent =
-            post.comments_count
-            ||
-            "—";
-
-
-        document.getElementById(
-            "shares"
-        ).textContent =
-            post.shares
-            ||
-            "—";
-
-
-        /* =================================
-           MOSTRAR
-        ================================= */
 
         document.getElementById(
             "loading"
@@ -837,13 +1044,15 @@ async function cargarPublicacion(){
             "flex";
 
 
-        requestAnimationFrame(
-            ajustarDescripcion
+        mostrarPost(
+            indiceActual
         );
+
 
     }
 
     catch(error){
+
 
         console.error(
             error
@@ -853,30 +1062,485 @@ async function cargarPublicacion(){
         document.getElementById(
             "loading"
         ).textContent =
-            "No se pudo cargar la publicación.";
+            "No se pudieron cargar las publicaciones.";
+
 
     }
 
 }
 
 
-/* =========================================
-   AJUSTAR DESCRIPCIÓN
-========================================= */
+/* =========================================================
+   MOSTRAR POST
+========================================================= */
 
-function ajustarDescripcion(){
+function mostrarPost(indice){
 
-    const texto =
-        document.getElementById(
-            "postText"
+
+    limpiarTemporizadores();
+
+
+    if(
+        !posts
+        ||
+        posts.length === 0
+    ){
+
+        return;
+
+    }
+
+
+    if(indice >= posts.length){
+
+        indice = 0;
+
+    }
+
+
+    indiceActual = indice;
+
+
+    const post =
+        posts[indiceActual];
+
+
+    /* -----------------------------------------------------
+       TEXTO
+    ----------------------------------------------------- */
+
+    texto.textContent =
+        post.text
+        ||
+        "";
+
+
+    /* -----------------------------------------------------
+       FECHA
+    ----------------------------------------------------- */
+
+    fecha.textContent =
+        post.date
+        ||
+        "Publicación reciente";
+
+
+    /* -----------------------------------------------------
+       INTERACCIONES
+    ----------------------------------------------------- */
+
+    likes.textContent =
+        post.likes
+        ||
+        "—";
+
+
+    comments.textContent =
+        post.comments_count
+        ||
+        "—";
+
+
+    shares.textContent =
+        post.shares
+        ||
+        "—";
+
+
+    /* -----------------------------------------------------
+       INDICADOR
+    ----------------------------------------------------- */
+
+    actualizarIndicador();
+
+
+    /* -----------------------------------------------------
+       AJUSTAR TEXTO
+    ----------------------------------------------------- */
+
+    requestAnimationFrame(
+        ajustarDescripcion
+    );
+
+
+    /* -----------------------------------------------------
+       VIDEO
+    ----------------------------------------------------- */
+
+    if(
+        post.type === "video"
+        &&
+        post.video
+    ){
+
+
+        mostrarVideo(
+            post
         );
 
 
-    let tamaño = 25;
+    }
+
+    /* -----------------------------------------------------
+       IMAGEN
+    ----------------------------------------------------- */
+
+    else{
+
+
+        mostrarImagen(
+            post
+        );
+
+
+    }
+
+}
+
+
+/* =========================================================
+   MOSTRAR IMAGEN
+========================================================= */
+
+function mostrarImagen(post){
+
+
+    video.pause();
+
+
+    video.removeAttribute(
+        "src"
+    );
+
+
+    video.load();
+
+
+    video.style.display =
+        "none";
+
+
+    imagen.style.display =
+        "block";
+
+
+    imagen.style.objectFit =
+        "contain";
+
+
+    imagen.style.background =
+        "#ffffff";
+
+
+    imagen.src =
+        (
+            post.image
+            ||
+            ""
+        )
+        +
+        "?t="
+        +
+        Date.now();
+
+
+    temporizador =
+        setTimeout(
+
+            siguientePost,
+
+            TIEMPO_IMAGEN
+
+        );
+
+}
+
+
+/* =========================================================
+   MOSTRAR VIDEO
+========================================================= */
+
+function mostrarVideo(post){
+
+
+    imagen.style.display =
+        "none";
+
+
+    video.style.display =
+        "block";
+
+
+    video.style.objectFit =
+        "contain";
+
+
+    video.style.background =
+        "#ffffff";
+
+
+    video.loop =
+        false;
+
+
+    video.muted =
+        true;
+
+
+    video.src =
+        post.video
+        +
+        "?t="
+        +
+        Date.now();
+
+
+    video.load();
+
+
+    video.play().catch(
+
+        error => {
+
+            console.log(
+                "Autoplay:",
+                error
+            );
+
+        }
+
+    );
+
+
+    /*
+        Si el video termina normalmente,
+        pasa al siguiente post.
+    */
+
+    video.onended =
+        function(){
+
+            siguientePost();
+
+        };
+
+
+    /*
+        Seguridad:
+        máximo 60 segundos.
+    */
+
+    temporizadorVideo =
+        setTimeout(
+
+            siguientePost,
+
+            TIEMPO_MAX_VIDEO
+
+        );
+
+}
+
+
+/* =========================================================
+   SIGUIENTE POST
+========================================================= */
+
+function siguientePost(){
+
+
+    limpiarTemporizadores();
+
+
+    if(
+        posts.length <= 1
+    ){
+
+
+        mostrarPost(
+            0
+        );
+
+
+        return;
+
+    }
+
+
+    let siguiente =
+        indiceActual + 1;
+
+
+    if(
+        siguiente >= posts.length
+    ){
+
+        siguiente = 0;
+
+    }
+
+
+    mostrarPost(
+        siguiente
+    );
+
+}
+
+
+/* =========================================================
+   LIMPIAR TEMPORIZADORES
+========================================================= */
+
+function limpiarTemporizadores(){
+
+
+    if(temporizador){
+
+        clearTimeout(
+            temporizador
+        );
+
+        temporizador =
+            null;
+
+    }
+
+
+    if(temporizadorVideo){
+
+        clearTimeout(
+            temporizadorVideo
+        );
+
+        temporizadorVideo =
+            null;
+
+    }
+
+
+    video.onended =
+        null;
+
+}
+
+
+/* =========================================================
+   INDICADORES
+========================================================= */
+
+function crearIndicadores(){
+
+
+    indicador.innerHTML =
+        "";
+
+
+    /*
+        Si solo hay un post,
+        no mostramos puntos.
+    */
+
+    if(
+        posts.length <= 1
+    ){
+
+        return;
+
+    }
+
+
+    posts.forEach(
+
+        (post, index) => {
+
+
+            const punto =
+                document.createElement(
+                    "div"
+                );
+
+
+            punto.className =
+                "dot";
+
+
+            punto.dataset.index =
+                index;
+
+
+            indicador.appendChild(
+                punto
+            );
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   ACTUALIZAR INDICADOR
+========================================================= */
+
+function actualizarIndicador(){
+
+
+    const puntos =
+        indicador.querySelectorAll(
+            ".dot"
+        );
+
+
+    puntos.forEach(
+
+        (
+            punto,
+            index
+        ) => {
+
+
+            if(
+                index ===
+                indiceActual
+            ){
+
+                punto.classList.add(
+                    "active"
+                );
+
+            }
+
+            else{
+
+                punto.classList.remove(
+                    "active"
+                );
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   AJUSTAR DESCRIPCIÓN
+========================================================= */
+
+function ajustarDescripcion(){
+
+
+    let tamaño =
+        25;
 
 
     texto.style.fontSize =
-        tamaño + "px";
+        tamaño
+        +
+        "px";
 
 
     while(
@@ -887,78 +1551,127 @@ function ajustarDescripcion(){
         tamaño > 16
     ){
 
+
         tamaño--;
 
+
         texto.style.fontSize =
-            tamaño + "px";
+            tamaño
+            +
+            "px";
 
     }
 
 }
 
 
-/* =========================================
-   FALLBACK SI FALLA VIDEO
-========================================= */
+/* =========================================================
+   SI FALLA EL VIDEO
+========================================================= */
 
-document.getElementById(
-    "postVideo"
-).addEventListener(
+video.addEventListener(
+
     "error",
+
     function(){
-
-        const video =
-            document.getElementById(
-                "postVideo"
-            );
-
-
-        const imagen =
-            document.getElementById(
-                "postImage"
-            );
-
-
-        video.style.display =
-            "none";
-
-
-        imagen.style.display =
-            "block";
 
 
         console.log(
-            "No se pudo reproducir el video. Mostrando portada."
+            "Error reproduciendo video."
         );
 
+
+        const post =
+            posts[
+                indiceActual
+            ];
+
+
+        /*
+            Si existe portada,
+            mostrarla.
+        */
+
+        if(
+            post
+            &&
+            post.image
+        ){
+
+
+            video.style.display =
+                "none";
+
+
+            imagen.style.display =
+                "block";
+
+
+            imagen.src =
+                post.image
+                +
+                "?t="
+                +
+                Date.now();
+
+
+            limpiarTemporizadores();
+
+
+            temporizador =
+                setTimeout(
+
+                    siguientePost,
+
+                    TIEMPO_IMAGEN
+
+                );
+
+        }
+
+        else{
+
+
+            siguientePost();
+
+
+        }
+
     }
+
 );
 
 
-/* =========================================
-   CARGA INICIAL
-========================================= */
-
-cargarPublicacion();
-
-
-/* =========================================
-   ACTUALIZACIÓN CADA HORA
-========================================= */
-
-setInterval(
-    cargarPublicacion,
-    ACTUALIZACION_MS
-);
-
-
-/* =========================================
-   AJUSTAR SI CAMBIA RESOLUCIÓN
-========================================= */
+/* =========================================================
+   CAMBIO DE RESOLUCIÓN
+========================================================= */
 
 window.addEventListener(
+
     "resize",
+
     ajustarDescripcion
+
+);
+
+
+/* =========================================================
+   CARGA INICIAL
+========================================================= */
+
+cargarPosts();
+
+
+/* =========================================================
+   ACTUALIZAR POSTS.JSON CADA HORA
+========================================================= */
+
+setInterval(
+
+    cargarPosts,
+
+    ACTUALIZAR_JSON
+
 );
 
 
