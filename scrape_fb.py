@@ -12,7 +12,7 @@ FACEBOOK_URL = "https://www.facebook.com/SuperFarmaciaVC/"
 
 
 # =========================================================
-# LIMPIAR / VALIDAR LINK DE POST
+# NORMALIZAR LINK DE POST
 # =========================================================
 
 def normalizar_link(href):
@@ -43,70 +43,55 @@ def normalizar_link(href):
 
 
 # =========================================================
-# BUSCAR LINK DEL ÚLTIMO POST
+# BUSCAR EL ÚLTIMO POST
 # =========================================================
 
 async def obtener_ultimo_post(page):
 
-    print("Buscando última publicación...")
+    articulos = page.locator(
+        '[role="article"]'
+    )
 
-    for intento in range(6):
+    cantidad = await articulos.count()
 
-        articulos = page.locator(
-            '[role="article"]'
-        )
+    print(
+        "Artículos encontrados:",
+        cantidad
+    )
 
-        cantidad = await articulos.count()
+    for i in range(
+        min(cantidad, 8)
+    ):
 
-        print(
-            "Artículos visibles:",
-            cantidad
-        )
+        articulo = articulos.nth(i)
 
-        for i in range(cantidad):
+        links = articulo.locator("a")
 
-            article = articulos.nth(i)
+        cantidad_links = await links.count()
 
-            links = article.locator("a")
+        for j in range(cantidad_links):
 
-            cantidad_links = await links.count()
+            try:
 
-            for j in range(cantidad_links):
+                href = await links.nth(j).get_attribute(
+                    "href"
+                )
 
-                try:
+                url = normalizar_link(
+                    href
+                )
 
-                    href = await links.nth(j).get_attribute(
-                        "href"
+                if url:
+
+                    print(
+                        "Post encontrado:",
+                        url
                     )
 
-                    url = normalizar_link(
-                        href
-                    )
+                    return url
 
-                    if url:
-
-                        print(
-                            "Último post encontrado:",
-                            url
-                        )
-
-                        return url
-
-                except:
-                    pass
-
-        await page.evaluate(
-            """
-            window.scrollBy(
-                0,
-                window.innerHeight * 1.2
-            )
-            """
-        )
-
-        await page.wait_for_timeout(
-            2000
-        )
+            except:
+                pass
 
     return None
 
@@ -117,118 +102,87 @@ async def obtener_ultimo_post(page):
 
 async def expandir_ver_mas(page):
 
-    print("Buscando 'Ver más'...")
+    for _ in range(5):
 
-    for intento in range(6):
+        encontrado = False
 
-        encontro = False
+        try:
 
-        selectores = [
-            'div[role="button"]',
-            'span[role="button"]',
-            'span',
-            'div'
-        ]
+            botones = page.locator(
+                'div[role="button"], span[role="button"], span, div'
+            )
 
-        for selector in selectores:
+            cantidad = await botones.count()
 
-            try:
+            for i in range(
+                min(cantidad, 500)
+            ):
 
-                elementos = page.locator(
-                    selector
-                )
+                try:
 
-                cantidad = await elementos.count()
+                    boton = botones.nth(i)
 
-                for i in range(
-                    min(cantidad, 500)
-                ):
+                    texto = (
+                        await boton.inner_text()
+                    ).strip()
 
-                    elemento = elementos.nth(i)
+                    if texto.lower() in [
+                        "ver más",
+                        "see more"
+                    ]:
 
-                    try:
+                        if await boton.is_visible():
 
-                        texto = (
-                            await elemento.inner_text()
-                        ).strip()
+                            await boton.evaluate(
+                                "el => el.click()"
+                            )
 
-                        if texto.lower() in [
-                            "ver más",
-                            "see more"
-                        ]:
+                            await page.wait_for_timeout(
+                                1500
+                            )
 
-                            if await elemento.is_visible():
+                            encontrado = True
 
-                                print(
-                                    "Haciendo clic en Ver más..."
-                                )
+                except:
+                    pass
 
-                                await elemento.evaluate(
-                                    "el => el.click()"
-                                )
+        except:
+            pass
 
-                                await page.wait_for_timeout(
-                                    2000
-                                )
-
-                                encontro = True
-
-                    except:
-                        pass
-
-            except:
-                pass
-
-        if not encontro:
+        if not encontrado:
             break
 
 
 # =========================================================
-# TEXTO + EMOJIS
+# LEER TEXTO CON EMOJIS
 # =========================================================
 
 async def texto_con_emojis(locator):
 
     try:
 
-        return await locator.evaluate(
-        """
+        return await locator.evaluate("""
         element => {
 
             function leer(node) {
 
                 let salida = "";
 
-                for (
-                    const child
-                    of node.childNodes
-                ) {
+                for (const child of node.childNodes) {
 
-                    if (
-                        child.nodeType ===
-                        Node.TEXT_NODE
-                    ) {
+                    if (child.nodeType === Node.TEXT_NODE) {
 
-                        salida +=
-                            child.textContent || "";
+                        salida += child.textContent || "";
 
                         continue;
                     }
 
-
-                    if (
-                        child.nodeType !==
-                        Node.ELEMENT_NODE
-                    ) {
-
+                    if (child.nodeType !== Node.ELEMENT_NODE) {
                         continue;
                     }
-
 
                     const tag =
-                        child.tagName
-                        .toLowerCase();
-
+                        child.tagName.toLowerCase();
 
                     if (tag === "br") {
 
@@ -237,42 +191,24 @@ async def texto_con_emojis(locator):
                         continue;
                     }
 
-
-                    /*
-                    Facebook puede mostrar
-                    emojis como imágenes.
-                    */
-
                     if (tag === "img") {
 
-                        const emoji =
+                        salida +=
                             child.getAttribute("alt") ||
                             child.getAttribute("aria-label") ||
                             child.getAttribute("title") ||
                             "";
 
-                        salida += emoji;
-
                         continue;
                     }
 
-
                     const aria =
-                        child.getAttribute(
-                            "aria-label"
-                        );
-
-
-                    /*
-                    Algunos emojis quedan
-                    dentro de spans.
-                    */
+                        child.getAttribute("aria-label");
 
                     if (
                         aria &&
                         aria.length <= 20 &&
-                        /[^a-zA-Z0-9\\s]/u
-                        .test(aria)
+                        /[^a-zA-Z0-9\\s]/u.test(aria)
                     ) {
 
                         salida += aria;
@@ -280,23 +216,18 @@ async def texto_con_emojis(locator):
                         continue;
                     }
 
-
                     salida += leer(child);
-
 
                     if (
                         tag === "div" ||
                         tag === "p"
                     ) {
-
                         salida += "\\n";
                     }
                 }
 
-
                 return salida;
             }
-
 
             return leer(element)
                 .replace(/\\u00a0/g, " ")
@@ -305,16 +236,14 @@ async def texto_con_emojis(locator):
                 .replace(/\\n{3,}/g, "\\n\\n")
                 .trim();
         }
-        """
-        )
+        """)
 
     except:
-
         return ""
 
 
 # =========================================================
-# DESCRIPCIÓN DEL POST INDIVIDUAL
+# OBTENER DESCRIPCIÓN
 # =========================================================
 
 async def obtener_descripcion(page):
@@ -323,11 +252,7 @@ async def obtener_descripcion(page):
         1500
     )
 
-
-    # --------------------------
-    # MÉTODO 1
-    # --------------------------
-
+    # Método principal
     try:
 
         mensajes = page.locator(
@@ -345,30 +270,22 @@ async def obtener_descripcion(page):
             )
 
             if texto:
-                candidatos.append(
-                    texto
-                )
-
+                candidatos.append(texto)
 
         if candidatos:
 
-            descripcion = max(
-                candidatos,
-                key=len
-            )
-
             return limpiar_texto(
-                descripcion
+                max(
+                    candidatos,
+                    key=len
+                )
             )
 
     except:
         pass
 
 
-    # --------------------------
-    # MÉTODO 2
-    # --------------------------
-
+    # Método alternativo
     try:
 
         bloques = page.locator(
@@ -390,7 +307,6 @@ async def obtener_descripcion(page):
                 if len(texto) < 40:
                     continue
 
-
                 basura = [
                     "todas las reacciones",
                     "comentar",
@@ -399,42 +315,31 @@ async def obtener_descripcion(page):
                     "crear cuenta"
                 ]
 
-
                 if any(
                     palabra in texto.lower()
                     for palabra in basura
                 ):
-
                     continue
 
-
-                candidatos.append(
-                    texto
-                )
+                candidatos.append(texto)
 
             except:
                 pass
 
-
         if candidatos:
 
-            descripcion = max(
-                candidatos,
-                key=len
-            )
-
             return limpiar_texto(
-                descripcion
+                max(
+                    candidatos,
+                    key=len
+                )
             )
 
     except:
         pass
 
 
-    # --------------------------
-    # MÉTODO 3 - META DESCRIPTION
-    # --------------------------
-
+    # Último recurso: meta description
     try:
 
         meta = page.locator(
@@ -448,14 +353,10 @@ async def obtener_descripcion(page):
             )
 
             if texto:
-
-                return limpiar_texto(
-                    texto
-                )
+                return limpiar_texto(texto)
 
     except:
         pass
-
 
     return ""
 
@@ -482,27 +383,23 @@ def limpiar_texto(texto):
 
 
 # =========================================================
-# CONSEGUIR IMAGEN EN MEJOR CALIDAD
+# BUSCAR IMAGEN DE MAYOR CALIDAD
 # =========================================================
 
 async def obtener_mejor_imagen(page):
 
     candidatos = []
 
-
-    # =====================================================
-    # 1. OG:IMAGE
-    # =====================================================
-
+    # 1. og:image
     try:
 
-        og_image = page.locator(
+        og = page.locator(
             'meta[property="og:image"]'
         )
 
-        if await og_image.count():
+        if await og.count():
 
-            src = await og_image.first.get_attribute(
+            src = await og.first.get_attribute(
                 "content"
             )
 
@@ -510,72 +407,61 @@ async def obtener_mejor_imagen(page):
 
                 candidatos.append(
                     (
-                        999999999,
+                        10**15,
                         src
                     )
+                )
+
+                print(
+                    "og:image encontrado"
                 )
 
     except:
         pass
 
 
-    # =====================================================
-    # 2. IMÁGENES DEL POST
-    # =====================================================
-
+    # 2. imágenes del DOM
     imagenes = page.locator("img")
 
     cantidad = await imagenes.count()
-
 
     for i in range(cantidad):
 
         try:
 
-            datos = await imagenes.nth(i).evaluate(
-            """
+            datos = await imagenes.nth(i).evaluate("""
             img => {
 
-                const candidatos = [];
+                let opciones = [];
 
                 if (img.currentSrc) {
-                    candidatos.push({
+                    opciones.push({
                         url: img.currentSrc,
-                        size:
-                            (img.naturalWidth || 0)
-                            *
+                        score:
+                            (img.naturalWidth || 0) *
                             (img.naturalHeight || 0)
                     });
                 }
-
 
                 if (img.src) {
-                    candidatos.push({
+                    opciones.push({
                         url: img.src,
-                        size:
-                            (img.naturalWidth || 0)
-                            *
+                        score:
+                            (img.naturalWidth || 0) *
                             (img.naturalHeight || 0)
                     });
                 }
 
-
                 const srcset =
-                    img.getAttribute(
-                        "srcset"
-                    );
-
+                    img.getAttribute("srcset");
 
                 if (srcset) {
 
-                    const opciones =
-                        srcset.split(",");
-
-                    opciones.forEach(
-                        opcion => {
+                    srcset.split(",").forEach(
+                        item => {
 
                             const partes =
-                                opcion
+                                item
                                 .trim()
                                 .split(/\\s+/);
 
@@ -584,28 +470,24 @@ async def obtener_mejor_imagen(page):
                                     partes[1]
                                 ) || 0;
 
-                            candidatos.push({
+                            opciones.push({
                                 url: partes[0],
-                                size:
-                                    numero *
-                                    numero
+                                score:
+                                    numero * numero
                             });
                         }
                     );
                 }
 
-
-                candidatos.sort(
+                opciones.sort(
                     (a,b) =>
-                    b.size - a.size
+                    b.score - a.score
                 );
 
-
                 return {
-
                     src:
-                        candidatos.length
-                        ? candidatos[0].url
+                        opciones.length
+                        ? opciones[0].url
                         : "",
 
                     width:
@@ -615,28 +497,22 @@ async def obtener_mejor_imagen(page):
                         img.naturalHeight || 0
                 };
             }
-            """
-            )
-
+            """)
 
             if not datos["src"]:
                 continue
 
-
-            # Evitar avatares e iconos
-            if (
-                datos["width"] < 500 or
-                datos["height"] < 350
-            ):
+            if datos["width"] < 500:
                 continue
 
+            if datos["height"] < 350:
+                continue
 
             area = (
                 datos["width"]
                 *
                 datos["height"]
             )
-
 
             candidatos.append(
                 (
@@ -650,7 +526,6 @@ async def obtener_mejor_imagen(page):
 
 
     if not candidatos:
-
         return ""
 
 
@@ -659,17 +534,15 @@ async def obtener_mejor_imagen(page):
         reverse=True
     )
 
-
     print(
         "Imagen de mejor calidad encontrada."
     )
-
 
     return candidatos[0][1]
 
 
 # =========================================================
-# DESCARGAR IMAGEN
+# DESCARGAR IMAGEN A GITHUB
 # =========================================================
 
 async def descargar_imagen(
@@ -682,12 +555,10 @@ async def descargar_imagen(
         exist_ok=True
     )
 
-
     ruta = (
         "posts/"
         "ultima_publicacion.jpg"
     )
-
 
     try:
 
@@ -697,13 +568,11 @@ async def descargar_imagen(
             )
         )
 
-
         if respuesta.ok:
 
             contenido = (
                 await respuesta.body()
             )
-
 
             with open(
                 ruta,
@@ -714,25 +583,20 @@ async def descargar_imagen(
                     contenido
                 )
 
-
             print(
-                "Imagen guardada:",
+                "Imagen descargada:",
                 ruta
             )
-
 
             return ruta
 
     except Exception as e:
 
         print(
-            "No se pudo descargar imagen:",
+            "Error descargando imagen:",
             e
         )
 
-
-    # Si falla descarga,
-    # dejamos URL Facebook
     return url
 
 
@@ -753,11 +617,8 @@ def extraer_numero(
             re.IGNORECASE
         )
 
-
         if resultado:
-
             return resultado.group(1)
-
 
     return "—"
 
@@ -771,7 +632,6 @@ async def obtener_metricas(page):
         ).inner_text()
 
     except:
-
         texto = ""
 
 
@@ -779,8 +639,7 @@ async def obtener_metricas(page):
 
         aria = await page.locator(
             "[aria-label]"
-        ).evaluate_all(
-        """
+        ).evaluate_all("""
         elementos =>
             elementos
             .map(
@@ -791,9 +650,7 @@ async def obtener_metricas(page):
             )
             .filter(Boolean)
             .join("\\n")
-        """
-        )
-
+        """)
 
         texto += (
             "\\n"
@@ -813,7 +670,6 @@ async def obtener_metricas(page):
         ]
     )
 
-
     comentarios = extraer_numero(
         texto,
         [
@@ -821,7 +677,6 @@ async def obtener_metricas(page):
             r"([\d.,KkMm]+)\s+comentario"
         ]
     )
-
 
     compartidos = extraer_numero(
         texto,
@@ -831,7 +686,6 @@ async def obtener_metricas(page):
             r"([\d.,KkMm]+)\s+compartido"
         ]
     )
-
 
     return (
         likes,
@@ -852,7 +706,6 @@ async def main():
             headless=True
         )
 
-
         context = await browser.new_context(
 
             viewport={
@@ -864,27 +717,23 @@ async def main():
 
             user_agent=(
                 "Mozilla/5.0 "
-                "(Windows NT 10.0; "
-                "Win64; x64) "
+                "(Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 "
                 "(KHTML, like Gecko) "
-                "Chrome/140.0 "
-                "Safari/537.36"
+                "Chrome/140.0 Safari/537.36"
             )
         )
 
 
-        # =================================================
+        # -----------------------------------------
         # ABRIR PÁGINA PRINCIPAL
-        # =================================================
+        # -----------------------------------------
 
         page = await context.new_page()
-
 
         print(
             "Abriendo Facebook..."
         )
-
 
         await page.goto(
             FACEBOOK_URL,
@@ -892,47 +741,41 @@ async def main():
             timeout=90000
         )
 
-
         await page.wait_for_timeout(
             10000
         )
 
 
-        # =================================================
-        # OBTENER LINK DEL ÚLTIMO POST
-        # =================================================
+        # -----------------------------------------
+        # BUSCAR ÚLTIMO POST
+        # -----------------------------------------
 
         post_url = await obtener_ultimo_post(
             page
         )
 
-
         if not post_url:
 
             print(
-                "No se encontró "
-                "el último post."
+                "No se encontró el último post."
             )
 
             await browser.close()
 
             return
 
-
         await page.close()
 
 
-        # =================================================
-        # ABRIR POST INDIVIDUAL
-        # =================================================
+        # -----------------------------------------
+        # ABRIR EL POST INDIVIDUAL
+        # -----------------------------------------
 
         post_page = await context.new_page()
-
 
         print(
             "Abriendo publicación individual..."
         )
-
 
         await post_page.goto(
             post_url,
@@ -940,37 +783,34 @@ async def main():
             timeout=90000
         )
 
-
         await post_page.wait_for_timeout(
             8000
         )
 
 
-        # =================================================
-        # EXPANDIR TEXTO
-        # =================================================
+        # -----------------------------------------
+        # EXPANDIR DESCRIPCIÓN
+        # -----------------------------------------
 
         await expandir_ver_mas(
             post_page
         )
-
 
         await post_page.wait_for_timeout(
             2000
         )
 
 
-        # =================================================
-        # DESCRIPCIÓN
-        # =================================================
+        # -----------------------------------------
+        # TEXTO
+        # -----------------------------------------
 
         descripcion = await obtener_descripcion(
             post_page
         )
 
-
         print(
-            "\nDESCRIPCIÓN:"
+            "Descripción obtenida:"
         )
 
         print(
@@ -978,14 +818,13 @@ async def main():
         )
 
 
-        # =================================================
+        # -----------------------------------------
         # IMAGEN
-        # =================================================
+        # -----------------------------------------
 
         imagen_url = await obtener_mejor_imagen(
             post_page
         )
-
 
         if imagen_url:
 
@@ -999,9 +838,9 @@ async def main():
             imagen_final = ""
 
 
-        # =================================================
+        # -----------------------------------------
         # MÉTRICAS
-        # =================================================
+        # -----------------------------------------
 
         (
             likes,
@@ -1017,15 +856,14 @@ async def main():
         await browser.close()
 
 
-        # =================================================
+        # -----------------------------------------
         # VALIDACIÓN
-        # =================================================
+        # -----------------------------------------
 
         if not descripcion:
 
             print(
-                "No se pudo obtener "
-                "la descripción completa."
+                "No se pudo obtener la descripción."
             )
 
             print(
@@ -1048,9 +886,9 @@ async def main():
             return
 
 
-        # =================================================
-        # GUARDAR
-        # =================================================
+        # -----------------------------------------
+        # GUARDAR POSTS.JSON
+        # -----------------------------------------
 
         resultado = [
             {
@@ -1098,7 +936,7 @@ async def main():
 
 
         print(
-            "\nposts.json actualizado correctamente."
+            "posts.json actualizado correctamente."
         )
 
 
