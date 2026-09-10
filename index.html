@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
 <meta charset="UTF-8">
 
 <meta name="viewport"
@@ -12,283 +10,427 @@ content="width=device-width, initial-scale=1.0">
 
 <style>
 
-* {
-    box-sizing: border-box;
+*{
+    box-sizing:border-box;
 }
 
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: Arial, Helvetica, sans-serif;
-    background: white;
+html,
+body{
+    margin:0;
+    padding:0;
+
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+
+    background:#ffffff;
+
+    font-family:
+    Arial,
+    "Segoe UI",
+    "Segoe UI Emoji",
+    "Apple Color Emoji",
+    sans-serif;
 }
 
-.screen {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
+
+/* =========================
+   PANTALLA
+========================= */
+
+.screen{
+    width:100vw;
+    height:100vh;
+
+    display:flex;
+    flex-direction:column;
 }
 
-/* CABECERA */
 
-.header {
-    height: 10vh;
-    min-height: 85px;
+/* =========================
+   CABECERA
+========================= */
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.header{
+    height:10vh;
+    min-height:82px;
 
-    padding: 0 3vw;
+    flex-shrink:0;
 
-    background: white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 
-    border-bottom: 1px solid #e5e9ef;
+    padding:0 3vw;
+
+    background:#ffffff;
+
+    border-bottom:
+    1px solid #e4e9ef;
 }
 
-.brand h1 {
-    margin: 0;
 
-    font-size: 2vw;
+.brand h1{
+    margin:0;
 
-    color: #174c87;
+    font-size:2vw;
+
+    font-weight:700;
+
+    color:#174c87;
 }
 
-.brand p {
-    margin: 5px 0 0;
 
-    font-size: 1vw;
+.brand p{
+    margin:5px 0 0;
 
-    color: #67798c;
+    font-size:1vw;
+
+    color:#67798c;
 }
 
-.facebook {
-    color: #1877f2;
 
-    font-size: 1.4vw;
+.facebook-title{
+    font-size:1.35vw;
 
-    font-weight: bold;
+    font-weight:bold;
+
+    color:#1877f2;
 }
 
-/* PUBLICACIÓN */
 
-.post {
-    flex: 1;
+/* =========================
+   PUBLICACIÓN
+========================= */
 
-    height: 90vh;
+.post{
+    flex:1;
 
-    display: grid;
+    width:100%;
 
-    grid-template-columns: 62% 38%;
+    display:grid;
+
+    grid-template-columns:
+    54% 46%;
+
+    overflow:hidden;
 }
 
-/* IMAGEN */
 
-.image-area {
-    width: 100%;
-    height: 100%;
+/* =========================
+   IMAGEN
+========================= */
 
-    background: #f2f2f2;
+.image-area{
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width:100%;
+    height:100%;
 
-    overflow: hidden;
+    background:#f2f4f7;
+
+    display:flex;
+
+    align-items:flex-start;
+    justify-content:flex-start;
+
+    overflow:hidden;
 }
 
-.image-area img {
-    width: 100%;
-    height: 100%;
 
-    object-fit: contain;
+.image-area img{
 
-    transition: opacity .5s ease;
+    width:100%;
+    height:100%;
 
-    background: #f5f5f5;
+    object-fit:contain;
+
+    object-position:left center;
+
+    display:block;
+
+    transition:
+    opacity .4s ease;
 }
 
-/* INFORMACIÓN */
 
-.info {
-    background: white;
+/* =========================
+   INFORMACIÓN
+========================= */
 
-    padding: 3vw;
+.info{
 
-    display: flex;
-    flex-direction: column;
+    height:100%;
 
-    overflow: hidden;
+    background:#ffffff;
+
+    padding:
+    2.6vw 3vw;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
 }
 
-.profile {
-    display: flex;
-    align-items: center;
 
-    gap: 15px;
+/* PERFIL */
+
+.profile{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
 }
 
-.avatar {
-    width: 62px;
-    height: 62px;
 
-    flex-shrink: 0;
+.avatar{
 
-    border-radius: 50%;
+    width:58px;
+    height:58px;
 
-    background: #174c87;
+    flex-shrink:0;
 
-    color: white;
+    border-radius:50%;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background:#174c87;
 
-    font-size: 18px;
-    font-weight: bold;
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    font-size:18px;
+
+    font-weight:bold;
 }
 
-.page-name {
-    font-size: 1.25vw;
 
-    font-weight: bold;
+.page-name{
 
-    color: #174c87;
+    font-size:1.2vw;
+
+    font-weight:bold;
+
+    color:#174c87;
 }
 
-.date {
-    margin-top: 5px;
 
-    font-size: .9vw;
+.date{
 
-    color: #8996a5;
+    margin-top:4px;
+
+    font-size:.85vw;
+
+    color:#8996a5;
 }
 
-/* DESCRIPCIÓN */
 
-.description {
-    margin-top: 4vh;
+/* =========================
+   DESCRIPCIÓN
+========================= */
 
-    font-size: 1.45vw;
+.description{
 
-    line-height: 1.5;
+    margin-top:3.2vh;
 
-    color: #27394c;
+    flex:1;
 
-    overflow: hidden;
+    overflow:hidden;
+
+    font-size:1.42vw;
+
+    line-height:1.48;
+
+    color:#27394c;
+
+    white-space:pre-line;
+
+    padding-right:1vw;
 }
 
-/* INTERACCIONES */
 
-.stats {
-    margin-top: 4vh;
+/* =========================
+   INTERACCIONES
+========================= */
 
-    padding: 22px 0;
+.stats{
 
-    display: flex;
+    margin-top:2vh;
 
-    justify-content: space-around;
+    padding:
+    20px 0;
 
-    border-top: 1px solid #e5eaf0;
-    border-bottom: 1px solid #e5eaf0;
+    display:grid;
+
+    grid-template-columns:
+    repeat(3,1fr);
+
+    border-top:
+    1px solid #e5eaf0;
+
+    border-bottom:
+    1px solid #e5eaf0;
 }
 
-.stat {
-    text-align: center;
+
+.stat{
+
+    text-align:center;
 }
 
-.stat-number {
-    font-size: 1.7vw;
 
-    font-weight: bold;
+.stat-number{
 
-    color: #174c87;
+    font-size:1.65vw;
+
+    font-weight:bold;
+
+    color:#174c87;
 }
 
-.stat-label {
-    margin-top: 5px;
 
-    font-size: .8vw;
+.stat-label{
 
-    color: #7d8996;
+    margin-top:6px;
+
+    font-size:.82vw;
+
+    color:#7d8996;
 }
 
-/* INFERIOR */
 
-.bottom {
-    margin-top: auto;
+/* =========================
+   PARTE INFERIOR
+========================= */
+
+.bottom{
+
+    margin-top:2vh;
+
+    flex-shrink:0;
 }
 
-.progress {
-    width: 100%;
 
-    height: 5px;
+.progress{
 
-    margin-bottom: 20px;
+    width:100%;
 
-    background: #e5eaf0;
+    height:5px;
 
-    border-radius: 10px;
+    margin-bottom:18px;
 
-    overflow: hidden;
+    background:#e4e9ef;
+
+    border-radius:10px;
+
+    overflow:hidden;
 }
 
-.progress-bar {
-    width: 0%;
-    height: 100%;
 
-    background: #1877f2;
+.progress-bar{
+
+    width:0%;
+
+    height:100%;
+
+    background:#1877f2;
 }
 
-.footer {
-    display: flex;
 
-    align-items: center;
+.footer{
 
-    justify-content: space-between;
+    display:grid;
+
+    grid-template-columns:
+    1fr auto 1fr;
+
+    align-items:center;
+
+    gap:15px;
 }
 
-.link {
-    color: #1877f2;
 
-    font-weight: bold;
+.link{
 
-    text-decoration: none;
+    color:#1877f2;
 
-    font-size: .9vw;
+    font-size:.9vw;
+
+    font-weight:bold;
+
+    text-decoration:none;
+
+    justify-self:start;
 }
 
-.counter {
-    color: #8794a2;
 
-    font-size: .85vw;
+.counter{
+
+    color:#8794a2;
+
+    font-size:.88vw;
+
+    justify-self:center;
 }
 
-.follow {
-    padding: 12px 20px;
 
-    border-radius: 25px;
+.follow{
 
-    background: #1877f2;
+    background:#1877f2;
 
-    color: white;
+    color:white;
 
-    font-size: .9vw;
+    padding:
+    11px 20px;
 
-    font-weight: bold;
+    border-radius:24px;
+
+    font-size:.9vw;
+
+    font-weight:bold;
+
+    justify-self:end;
+}
+
+
+/* =========================
+   MENSAJE DE ERROR
+========================= */
+
+.error{
+
+    width:100vw;
+    height:100vh;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:40px;
+
+    text-align:center;
+
+    font-size:28px;
+
+    color:#174c87;
 }
 
 </style>
-
 </head>
 
 
 <body>
 
 <div class="screen">
+
+    <!-- CABECERA -->
 
     <div class="header">
 
@@ -304,12 +446,15 @@ html, body {
 
         </div>
 
-        <div class="facebook">
+
+        <div class="facebook-title">
             Facebook · @SuperFarmaciaVC
         </div>
 
     </div>
 
+
+    <!-- PUBLICACIÓN -->
 
     <div class="post">
 
@@ -419,6 +564,8 @@ html, body {
             </div>
 
 
+            <!-- PARTE INFERIOR -->
+
             <div class="bottom">
 
                 <div class="progress">
@@ -436,6 +583,7 @@ html, body {
                     <a
                     class="link"
                     id="postLink"
+                    href="https://www.facebook.com/SuperFarmaciaVC/"
                     target="_blank">
 
                         Ver publicación
@@ -446,11 +594,16 @@ html, body {
                     <div
                     class="counter"
                     id="counter">
+
+                        0 / 0
+
                     </div>
 
 
                     <div class="follow">
+
                         Síguenos en Facebook
+
                     </div>
 
                 </div>
@@ -466,65 +619,149 @@ html, body {
 
 <script>
 
-const TIEMPO_POST = 60000;
+/* =========================
+   CONFIGURACIÓN
+========================= */
+
+const TIEMPO_POR_PUBLICACION =
+60000; // 60 segundos
+
+
+const RECARGAR_JSON =
+3600000; // 1 hora
+
 
 let posts = [];
 
 let actual = 0;
 
-let timer;
+let timerPosts = null;
 
 
-/* CARGAR PUBLICACIONES */
+/* =========================
+   CARGAR POSTS.JSON
+========================= */
 
 async function cargarPosts(){
 
-    try {
+    try{
 
         const respuesta =
         await fetch(
             "posts.json?t=" +
-            Date.now()
+            Date.now(),
+            {
+                cache:"no-store"
+            }
         );
 
-        posts =
+
+        if(!respuesta.ok){
+
+            throw new Error(
+                "No se pudo cargar posts.json"
+            );
+
+        }
+
+
+        const datos =
         await respuesta.json();
 
+
+        if(
+            !Array.isArray(datos)
+            ||
+            datos.length === 0
+        ){
+
+            throw new Error(
+                "posts.json no tiene publicaciones"
+            );
+
+        }
+
+
+        /*
+        Máximo 3 publicaciones
+        */
+
         posts =
-        posts.slice(0,3);
+        datos.slice(0,3);
+
 
         actual = 0;
 
-        mostrarPost();
 
-        if(timer){
-            clearInterval(timer);
+        mostrarPost(
+            actual
+        );
+
+
+        /*
+        Reiniciar temporizador
+        */
+
+        if(timerPosts){
+
+            clearInterval(
+                timerPosts
+            );
+
         }
 
-        timer =
-        setInterval(
-            siguiente,
-            TIEMPO_POST
-        );
+
+        if(posts.length > 1){
+
+            timerPosts =
+            setInterval(
+
+                siguientePost,
+
+                TIEMPO_POR_PUBLICACION
+
+            );
+
+        }
 
     }
 
     catch(error){
 
-        console.error(error);
+        console.error(
+            "Error:",
+            error
+        );
+
+        document.body.innerHTML =
+        `
+        <div class="error">
+            No se pudieron cargar
+            las publicaciones.
+        </div>
+        `;
 
     }
 
 }
 
 
-/* MOSTRAR POST */
+/* =========================
+   MOSTRAR PUBLICACIÓN
+========================= */
 
-function mostrarPost(){
+function mostrarPost(index){
 
     const post =
-    posts[actual];
+    posts[index];
 
+
+    if(!post){
+        return;
+    }
+
+
+    /* IMAGEN */
 
     const imagen =
     document.getElementById(
@@ -532,90 +769,120 @@ function mostrarPost(){
     );
 
 
-    imagen.style.opacity = 0;
+    imagen.style.opacity =
+    "0";
 
 
     setTimeout(()=>{
 
         imagen.src =
-        post.image;
+        post.image || "";
 
-        imagen.style.opacity = 1;
+        imagen.style.opacity =
+        "1";
 
-    },250);
+    },200);
 
 
-    document.getElementById(
-        "postText"
-    ).innerText =
-    post.text || "";
-
+    /* FECHA */
 
     document.getElementById(
         "postDate"
-    ).innerText =
+    ).textContent =
     post.date ||
     "Publicación reciente";
 
 
+    /* DESCRIPCIÓN */
+
+    document.getElementById(
+        "postText"
+    ).textContent =
+    post.text || "";
+
+
+    /* REACCIONES */
+
     document.getElementById(
         "likes"
-    ).innerText =
+    ).textContent =
     post.likes || "—";
 
 
+    /* COMENTARIOS */
+
     document.getElementById(
         "comments"
-    ).innerText =
-    post.comments_count || "—";
+    ).textContent =
+    post.comments_count ||
+    "—";
 
+
+    /* COMPARTIDOS */
 
     document.getElementById(
         "shares"
-    ).innerText =
+    ).textContent =
     post.shares || "—";
 
+
+    /* LINK */
 
     document.getElementById(
         "postLink"
     ).href =
-    post.url;
+    post.url ||
+    "https://www.facebook.com/SuperFarmaciaVC/";
 
+
+    /* CONTADOR */
 
     document.getElementById(
         "counter"
-    ).innerText =
-    (actual + 1)
-    + " / "
-    + posts.length;
+    ).textContent =
+    (index + 1)
+    +
+    " / "
+    +
+    posts.length;
 
 
-    barraTiempo();
+    iniciarBarra();
 
 }
 
 
-/* SIGUIENTE */
+/* =========================
+   SIGUIENTE POST
+========================= */
 
-function siguiente(){
+function siguientePost(){
 
     actual++;
+
 
     if(
         actual >=
         posts.length
     ){
+
         actual = 0;
+
     }
 
-    mostrarPost();
+
+    mostrarPost(
+        actual
+    );
 
 }
 
 
-/* BARRA 1 MINUTO */
+/* =========================
+   BARRA DE 60 SEGUNDOS
+========================= */
 
-function barraTiempo(){
+function iniciarBarra(){
 
     const barra =
     document.getElementById(
@@ -626,6 +893,7 @@ function barraTiempo(){
     barra.style.transition =
     "none";
 
+
     barra.style.width =
     "0%";
 
@@ -635,6 +903,7 @@ function barraTiempo(){
         barra.style.transition =
         "width 60s linear";
 
+
         barra.style.width =
         "100%";
 
@@ -643,20 +912,25 @@ function barraTiempo(){
 }
 
 
-/* INICIAR */
+/* =========================
+   INICIAR
+========================= */
 
 cargarPosts();
 
 
-/* COMPROBAR CAMBIOS CADA HORA */
+/*
+Cada hora vuelve a leer
+posts.json por si GitHub
+lo actualizó
+*/
 
 setInterval(
     cargarPosts,
-    3600000
+    RECARGAR_JSON
 );
 
 </script>
 
 </body>
-
 </html>
