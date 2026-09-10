@@ -9,8 +9,20 @@
     "likes": "1",
     "comments_count": "—",
     "shares": "—",
-    "timestamp": 0,
-    "source": "principal",
-    "scraped_at": "2026-09-10T22:38:39.803320+00:00"
+    "source": "desktop",
+    "scraped_at": "2026-09-10T22:44:49.830538+00:00"
+  },
+  {
+    "type": "image",
+    "text": "Publicación reciente de Super Farmacia",
+    "image": "posts/post_2.jpg",
+    "video": "",
+    "url": "https://www.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Fphoto%2F%3Ffbid%3D1010085741154451%26set%3Da.614671164029246",
+    "date": "Publicación reciente",
+    "likes": "—",
+    "comments_count": "—",
+    "shares": "—",
+    "source": "desktop",
+    "scraped_at": "2026-09-10T22:44:58.846954+00:00"
   }
 ]
