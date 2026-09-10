@@ -1,646 +1,477 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-<title>Facebook - Super Farmacia</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<style>
+    <title>Super Farmacia - Facebook</title>
 
-*{
-    box-sizing:border-box;
-}
+    <style>
 
-html,
-body{
-    margin:0;
-    padding:0;
+        *{
+            box-sizing:border-box;
+        }
 
-    width:100%;
-    height:100%;
+        html,
+        body{
+            margin:0;
+            padding:0;
+            width:100%;
+            height:100%;
+            overflow:hidden;
 
-    overflow:hidden;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
 
-    background:#ffffff;
+            background:#ffffff;
+            color:#172033;
+        }
 
-    font-family:
-        Arial,
-        "Segoe UI",
-        "Segoe UI Emoji",
-        "Apple Color Emoji",
-        "Noto Color Emoji",
-        sans-serif;
-}
 
+        /* CONTENEDOR PRINCIPAL */
 
-/* =========================
-   PANTALLA
-========================= */
+        .screen{
+            width:100vw;
+            height:100vh;
 
-.screen{
-    width:100vw;
-    height:100vh;
+            display:flex;
 
-    display:flex;
-    flex-direction:column;
-}
+            background:#ffffff;
+        }
 
 
-/* =========================
-   CABECERA
-========================= */
+        /* =======================================
+           IZQUIERDA: IMAGEN
+        ======================================= */
 
-.header{
-    height:10vh;
-    min-height:82px;
+        .image-area{
+            width:45%;
+            height:100%;
 
-    flex-shrink:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
 
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+            background:#f4f6f8;
 
-    padding:0 3vw;
+            overflow:hidden;
+        }
 
-    background:#ffffff;
+        .image-area img{
+            width:100%;
+            height:100%;
 
-    border-bottom:
-        1px solid #e4e9ef;
-}
+            object-fit:contain;
+            object-position:center;
 
+            display:block;
+        }
 
-.brand h1{
-    margin:0;
 
-    font-size:2vw;
+        /* =======================================
+           DERECHA
+        ======================================= */
 
-    font-weight:700;
+        .info{
+            width:55%;
+            height:100%;
 
-    color:#174c87;
-}
+            padding:
+                4vh
+                3.2vw
+                3vh
+                3.2vw;
 
+            display:flex;
+            flex-direction:column;
 
-.brand p{
-    margin:5px 0 0;
+            background:#ffffff;
+        }
 
-    font-size:1vw;
 
-    color:#67798c;
-}
+        /* PERFIL */
 
+        .profile{
+            display:flex;
+            align-items:center;
 
-.facebook-title{
-    font-size:1.35vw;
+            gap:16px;
 
-    font-weight:bold;
+            flex-shrink:0;
 
-    color:#1877f2;
-}
+            margin-bottom:2.5vh;
+        }
 
 
-/* =========================
-   CONTENIDO PRINCIPAL
-========================= */
+        /* AVATAR SF */
 
-.post{
-    flex:1;
+        .avatar{
+            width:64px;
+            height:64px;
 
-    width:100%;
+            flex-shrink:0;
 
-    display:grid;
+            border-radius:50%;
 
-    grid-template-columns:
-        45% 55%;
+            background:#174c87;
+            color:#ffffff;
 
-    overflow:hidden;
-}
+            display:flex;
+            align-items:center;
+            justify-content:center;
 
+            font-size:20px;
+            font-weight:700;
 
-/* =========================
-   IMAGEN
-========================= */
+            letter-spacing:0.5px;
+        }
 
-.image-area{
-    width:100%;
-    height:100%;
 
-    background:#f2f4f7;
+        .profile-data{
+            display:flex;
+            flex-direction:column;
 
-    display:flex;
-    align-items:center;
-    justify-content:flex-start;
+            min-width:0;
+        }
 
-    overflow:hidden;
-}
 
+        .page-name{
+            font-size:24px;
+            font-weight:700;
 
-.image-area img{
-    width:100%;
-    height:100%;
+            line-height:1.2;
 
-    object-fit:contain;
-    object-position:center;
+            color:#152238;
+        }
 
-    display:block;
 
-    transition:
-        opacity .4s ease;
-}
+        .date{
+            margin-top:5px;
 
+            font-size:15px;
 
-/* =========================
-   PANEL DERECHO
-========================= */
+            color:#6b7280;
+        }
 
-.info{
-    width:100%;
-    height:100%;
 
-    background:#ffffff;
+        /* =======================================
+           DESCRIPCIÓN
+        ======================================= */
 
-    padding:
-        2.3vw 2.8vw;
+        .description-wrap{
+            flex:1;
 
-    display:flex;
-    flex-direction:column;
+            min-height:0;
 
-    overflow:hidden;
-}
+            overflow:hidden;
 
+            display:flex;
+        }
 
-/* =========================
-   PERFIL
-========================= */
 
-.profile{
-    display:flex;
+        .description{
+            width:100%;
+            height:100%;
 
-    align-items:center;
+            font-size:26px;
+            line-height:1.48;
 
-    gap:15px;
+            white-space:pre-wrap;
 
-    flex-shrink:0;
-}
+            overflow:hidden;
 
+            color:#20242c;
 
-.avatar{
-    width:58px;
-    height:58px;
+            word-break:normal;
+            overflow-wrap:break-word;
+        }
 
-    flex-shrink:0;
 
-    border-radius:50%;
+        /* =======================================
+           MÉTRICAS
+        ======================================= */
 
-    overflow:hidden;
+        .stats{
+            flex-shrink:0;
 
-    background:#ffffff;
+            border-top:1px solid #e6e9ee;
 
-    border:2px solid #e6edf5;
+            margin-top:2vh;
+            padding-top:2vh;
 
-    display:flex;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
 
-    align-items:center;
-    justify-content:center;
-}
+            gap:20px;
 
+            color:#5d6470;
 
-.avatar img{
-    width:100%;
-    height:100%;
+            font-size:18px;
+        }
 
-    object-fit:cover;
 
-    display:block;
-}
+        .stat{
+            display:flex;
+            align-items:center;
 
+            gap:8px;
 
-.page-name{
-    font-size:1.2vw;
+            white-space:nowrap;
+        }
 
-    font-weight:bold;
 
-    color:#174c87;
-}
+        .reaction-icon{
+            width:28px;
+            height:28px;
 
+            border-radius:50%;
 
-.date{
-    margin-top:4px;
+            background:#1877f2;
+            color:#ffffff;
 
-    font-size:.85vw;
+            display:flex;
+            align-items:center;
+            justify-content:center;
 
-    color:#8996a5;
-}
+            font-size:15px;
+        }
 
 
-/* =========================
-   DESCRIPCIÓN
-========================= */
+        /* =======================================
+           ESTADO DE CARGA
+        ======================================= */
 
-.description{
-    margin-top:3vh;
+        .loading{
+            width:100%;
+            height:100%;
 
-    flex:1;
+            display:flex;
+            align-items:center;
+            justify-content:center;
 
-    font-size:1.35vw;
+            font-size:28px;
+            color:#174c87;
 
-    line-height:1.5;
+            background:#ffffff;
+        }
 
-    color:#27394c;
 
-    white-space:pre-wrap;
+        /* =======================================
+           ADAPTACIÓN PANTALLAS PEQUEÑAS
+        ======================================= */
 
-    overflow:hidden;
+        @media(max-width:900px){
 
-    padding-right:.4vw;
-}
+            .image-area{
+                width:43%;
+            }
 
+            .info{
+                width:57%;
+                padding:3vh 2.5vw;
+            }
 
-/* =========================
-   INTERACCIONES
-========================= */
+            .description{
+                font-size:20px;
+            }
 
-.stats{
-    margin-top:2vh;
+            .page-name{
+                font-size:20px;
+            }
 
-    padding:20px 0;
+            .stats{
+                font-size:15px;
+            }
 
-    display:grid;
+        }
 
-    grid-template-columns:
-        repeat(3,1fr);
+    </style>
 
-    border-top:
-        1px solid #e5eaf0;
-
-    border-bottom:
-        1px solid #e5eaf0;
-
-    flex-shrink:0;
-}
-
-
-.stat{
-    text-align:center;
-}
-
-
-.stat-number{
-    font-size:1.65vw;
-
-    font-weight:bold;
-
-    color:#174c87;
-}
-
-
-.stat-label{
-    margin-top:6px;
-
-    font-size:.82vw;
-
-    color:#7d8996;
-}
-
-
-/* =========================
-   PARTE INFERIOR
-========================= */
-
-.bottom{
-    margin-top:2vh;
-
-    flex-shrink:0;
-}
-
-
-.progress{
-    width:100%;
-
-    height:5px;
-
-    margin-bottom:18px;
-
-    background:#e4e9ef;
-
-    border-radius:10px;
-
-    overflow:hidden;
-}
-
-
-.progress-bar{
-    width:0%;
-    height:100%;
-
-    background:#1877f2;
-}
-
-
-.footer{
-    display:grid;
-
-    grid-template-columns:
-        1fr auto;
-
-    align-items:center;
-
-    gap:15px;
-}
-
-
-.link{
-    color:#1877f2;
-
-    font-size:.9vw;
-
-    font-weight:bold;
-
-    text-decoration:none;
-
-    justify-self:start;
-}
-
-
-.follow{
-    background:#1877f2;
-
-    color:#ffffff;
-
-    padding:
-        11px 20px;
-
-    border-radius:24px;
-
-    font-size:.9vw;
-
-    font-weight:bold;
-
-    justify-self:end;
-}
-
-
-/* =========================
-   ERROR
-========================= */
-
-.error{
-    width:100vw;
-    height:100vh;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    padding:40px;
-
-    text-align:center;
-
-    font-size:28px;
-
-    color:#174c87;
-}
-
-</style>
 </head>
 
 
 <body>
 
-<div class="screen">
 
-    <!-- CABECERA -->
-
-    <div class="header">
-
-        <div class="brand">
-
-            <h1>
-                Super Farmacia Virgen de Copacabana
-            </h1>
-
-            <p>
-                Nuestro compromiso es tu bienestar
-            </p>
-
-        </div>
+<div
+    id="loading"
+    class="loading"
+>
+    Cargando publicación...
+</div>
 
 
-        <div class="facebook-title">
+<div
+    id="screen"
+    class="screen"
+    style="display:none;"
+>
 
-            Facebook · @SuperFarmaciaVC
 
-        </div>
+    <!-- =====================================
+         IZQUIERDA: IMAGEN
+    ====================================== -->
+
+    <div class="image-area">
+
+        <img
+            id="postImage"
+            src=""
+            alt="Publicación"
+        >
 
     </div>
 
 
-    <!-- PUBLICACIÓN -->
 
-    <div class="post">
+    <!-- =====================================
+         DERECHA: INFORMACIÓN
+    ====================================== -->
 
-
-        <!-- IZQUIERDA: IMAGEN -->
-
-        <div class="image-area">
-
-            <img
-                id="postImage"
-                src=""
-                alt="Publicación">
-
-        </div>
+    <div class="info">
 
 
-        <!-- DERECHA: INFORMACIÓN -->
+        <!-- PERFIL -->
 
-        <div class="info">
+        <div class="profile">
 
 
-            <!-- PERFIL -->
+            <div class="avatar">
+                SF
+            </div>
 
-            <div class="profile">
 
-                <div class="avatar">
+            <div class="profile-data">
 
-                    <img
-                        id="avatarImg"
-                        src="posts/avatar_logo.jpg"
-                        alt="Logo Super Farmacia">
-
+                <div class="page-name">
+                    Super Farmacia Virgen de Copacabana
                 </div>
 
-
-                <div>
-
-                    <div class="page-name">
-
-                        Super Farmacia Virgen de Copacabana
-
-                    </div>
-
-
-                    <div
-                        class="date"
-                        id="postDate">
-
-                        Publicación reciente
-
-                    </div>
-
+                <div
+                    class="date"
+                    id="postDate"
+                >
+                    Publicación reciente
                 </div>
 
             </div>
 
 
-            <!-- DESCRIPCIÓN -->
+        </div>
+
+
+
+        <!-- DESCRIPCIÓN -->
+
+        <div class="description-wrap">
 
             <div
                 class="description"
-                id="postText">
-            </div>
-
-
-            <!-- INTERACCIONES -->
-
-            <div class="stats">
-
-
-                <div class="stat">
-
-                    <div
-                        class="stat-number"
-                        id="likes">
-
-                        —
-
-                    </div>
-
-                    <div class="stat-label">
-
-                        👍 Reacciones
-
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div
-                        class="stat-number"
-                        id="comments">
-
-                        —
-
-                    </div>
-
-                    <div class="stat-label">
-
-                        💬 Comentarios
-
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div
-                        class="stat-number"
-                        id="shares">
-
-                        —
-
-                    </div>
-
-                    <div class="stat-label">
-
-                        ↗ Compartidos
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- INFERIOR -->
-
-            <div class="bottom">
-
-
-                <div class="progress">
-
-                    <div
-                        class="progress-bar"
-                        id="progressBar">
-                    </div>
-
-                </div>
-
-
-                <div class="footer">
-
-
-                    <a
-                        class="link"
-                        id="postLink"
-                        href="https://www.facebook.com/SuperFarmaciaVC/"
-                        target="_blank">
-
-                        Ver publicación
-
-                    </a>
-
-
-                    <div class="follow">
-
-                        Síguenos en Facebook
-
-                    </div>
-
-
-                </div>
-
-            </div>
+                id="postText"
+            ></div>
 
         </div>
 
+
+
+        <!-- ESTADÍSTICAS -->
+
+        <div class="stats">
+
+
+            <div class="stat">
+
+                <div class="reaction-icon">
+                    ♥
+                </div>
+
+                <span id="likes">
+                    —
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span>
+                    💬
+                </span>
+
+                <span id="comments">
+                    —
+                </span>
+
+                <span>
+                    comentarios
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span>
+                    ↗
+                </span>
+
+                <span id="shares">
+                    —
+                </span>
+
+                <span>
+                    compartidos
+                </span>
+
+            </div>
+
+
+        </div>
+
+
     </div>
+
 
 </div>
 
 
+
 <script>
 
-/* =========================
+
+/* =========================================
    CONFIGURACIÓN
-========================= */
+========================================= */
 
-const RECARGAR_JSON =
-    3600000; // cada hora
+const POSTS_JSON = "posts.json";
+
+const ACTUALIZACION_MS =
+    60 * 60 * 1000;
 
 
-/* =========================
-   CARGAR POST
-========================= */
+/* =========================================
+   CARGAR PUBLICACIÓN
+========================================= */
 
-async function cargarPost(){
+async function cargarPublicacion(){
 
     try{
 
-        const respuesta =
-            await fetch(
-                "posts.json?t=" +
-                Date.now(),
-                {
-                    cache:"no-store"
-                }
-            );
+        const respuesta = await fetch(
+            POSTS_JSON + "?t=" + Date.now(),
+            {
+                cache:"no-store"
+            }
+        );
 
 
         if(!respuesta.ok){
@@ -652,201 +483,212 @@ async function cargarPost(){
         }
 
 
-        const datos =
+        const posts =
             await respuesta.json();
 
 
         if(
-            !Array.isArray(datos)
+            !Array.isArray(posts)
             ||
-            datos.length === 0
+            posts.length === 0
         ){
 
             throw new Error(
-                "posts.json está vacío"
+                "No hay publicaciones"
             );
 
         }
 
 
         const post =
-            datos[0];
+            posts[0];
 
 
-        mostrarPost(
-            post
-        );
+        /* IMAGEN */
 
-    }
-
-    catch(error){
-
-        console.error(
-            error
-        );
-
-        document.body.innerHTML =
-        `
-        <div class="error">
-            No se pudo cargar la publicación.
-        </div>
-        `;
-
-    }
-
-}
-
-
-/* =========================
-   MOSTRAR POST
-========================= */
-
-function mostrarPost(post){
-
-
-    /* IMAGEN */
-
-    const imagen =
-        document.getElementById(
-            "postImage"
-        );
-
-
-    imagen.style.opacity =
-        "0";
-
-
-    setTimeout(()=>{
+        const imagen =
+            document.getElementById(
+                "postImage"
+            );
 
         imagen.src =
             post.image || "";
 
-        imagen.style.opacity =
-            "1";
 
-    },200);
+        /* TEXTO */
+
+        const texto =
+            document.getElementById(
+                "postText"
+            );
+
+        texto.textContent =
+            post.text || "";
 
 
-    /* LOGO */
+        /* FECHA */
 
-    const avatar =
         document.getElementById(
-            "avatarImg"
+            "postDate"
+        ).textContent =
+            post.date
+            ||
+            "Publicación reciente";
+
+
+        /* MÉTRICAS */
+
+        document.getElementById(
+            "likes"
+        ).textContent =
+            post.likes || "—";
+
+
+        document.getElementById(
+            "comments"
+        ).textContent =
+            post.comments_count || "—";
+
+
+        document.getElementById(
+            "shares"
+        ).textContent =
+            post.shares || "—";
+
+
+        /* MOSTRAR PANTALLA */
+
+        document.getElementById(
+            "loading"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "screen"
+        ).style.display =
+            "flex";
+
+
+        /* AJUSTAR DESCRIPCIÓN */
+
+        requestAnimationFrame(
+            ajustarDescripcion
         );
 
 
-    avatar.src =
-        post.avatar ||
-        "posts/avatar_logo.jpg";
+    }
+    catch(error){
+
+        console.error(
+            "Error:",
+            error
+        );
 
 
-    /* FECHA */
+        document.getElementById(
+            "loading"
+        ).textContent =
+            "No se pudo cargar la publicación.";
 
-    document.getElementById(
-        "postDate"
-    ).textContent =
-        post.date ||
-        "Publicación reciente";
-
-
-    /* DESCRIPCIÓN */
-
-    document.getElementById(
-        "postText"
-    ).textContent =
-        post.text || "";
-
-
-    /* REACCIONES */
-
-    document.getElementById(
-        "likes"
-    ).textContent =
-        post.likes ||
-        "—";
-
-
-    /* COMENTARIOS */
-
-    document.getElementById(
-        "comments"
-    ).textContent =
-        post.comments_count ||
-        "—";
-
-
-    /* COMPARTIDOS */
-
-    document.getElementById(
-        "shares"
-    ).textContent =
-        post.shares ||
-        "—";
-
-
-    /* LINK */
-
-    document.getElementById(
-        "postLink"
-    ).href =
-        post.url ||
-        "https://www.facebook.com/SuperFarmaciaVC/";
-
-
-    iniciarBarra();
+    }
 
 }
 
 
-/* =========================
-   BARRA
-========================= */
 
-function iniciarBarra(){
+/* =========================================
+   AJUSTAR TAMAÑO DEL TEXTO
+========================================= */
 
-    const barra =
+function ajustarDescripcion(){
+
+    const texto =
         document.getElementById(
-            "progressBar"
+            "postText"
         );
 
 
-    barra.style.transition =
-        "none";
+    let tamaño = 26;
 
 
-    barra.style.width =
-        "0%";
+    texto.style.fontSize =
+        tamaño + "px";
 
 
-    setTimeout(()=>{
+    while(
+        texto.scrollHeight
+        >
+        texto.clientHeight
+        &&
+        tamaño > 16
+    ){
 
-        barra.style.transition =
-            "width 60s linear";
+        tamaño--;
 
+        texto.style.fontSize =
+            tamaño + "px";
 
-        barra.style.width =
-            "100%";
-
-    },100);
+    }
 
 }
 
 
-/* =========================
+
+/* =========================================
+   ERROR DE IMAGEN
+========================================= */
+
+document.getElementById(
+    "postImage"
+).addEventListener(
+    "error",
+    function(){
+
+        console.log(
+            "No se pudo cargar la imagen."
+        );
+
+    }
+);
+
+
+
+/* =========================================
    INICIO
-========================= */
+========================================= */
 
-cargarPost();
+cargarPublicacion();
 
 
-/* Revisa cada hora si cambió el post */
+
+/* =========================================
+   ACTUALIZACIÓN AUTOMÁTICA
+========================================= */
 
 setInterval(
-    cargarPost,
-    RECARGAR_JSON
+
+    cargarPublicacion,
+
+    ACTUALIZACION_MS
+
 );
+
+
+
+/* =========================================
+   AJUSTAR SI CAMBIA RESOLUCIÓN
+========================================= */
+
+window.addEventListener(
+    "resize",
+    ajustarDescripcion
+);
+
 
 </script>
 
+
 </body>
+
 </html>
