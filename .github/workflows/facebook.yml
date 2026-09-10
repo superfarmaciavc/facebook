@@ -35,6 +35,6 @@ jobs:
         run: |
           git config user.name "Facebook TV Bot"
           git config user.email "actions@github.com"
-          git add posts.json posts/
+          git add posts.json
           git diff --cached --quiet || git commit -m "Actualizar publicaciones Facebook"
           git push
