@@ -2,336 +2,767 @@ import asyncio
 import json
 import re
 from datetime import datetime, timezone
+
 from playwright.async_api import async_playwright
 
-FACEBOOK_URL = "https://www.facebook.com/SuperFarmaciaVC/"
-MAX_POSTS = 3
 
-# =========================================================
-# TEXTO CON EMOJIS
-# =========================================================
-async def texto_con_emojis(locator):
+FACEBOOK_URL = "https://www.facebook.com/SuperFarmaciaVC/"
+
+
+async def expandir_ver_mas(article):
+    """
+    Intenta pulsar todos los 'Ver más' dentro del post.
+    """
+
+    for _ in range(5):
+
+        try:
+            botones = article.get_by_text(
+                re.compile(r"^(Ver más|See more)$", re.I)
+            )
+
+            cantidad = await botones.count()
+
+            if cantidad == 0:
+                return
+
+            for i in range(cantidad):
+                try:
+                    await botones.nth(i).click(
+                        timeout=2500,
+                        force=True
+                    )
+
+                    await asyncio.sleep(0.7)
+
+                except:
+                    pass
+
+        except:
+            return
+
+
+async def obtener_texto_completo(locator):
+    """
+    Reconstruye texto, saltos de línea y emojis.
+    Facebook puede representar algunos emojis como
+    imágenes, aria-label o texto normal.
+    """
+
     try:
-        return await locator.evaluate("""
-            element => {
-                function recorrer(node) {
-                    let salida = "";
-                    for (const child of node.childNodes) {
-                        if (child.nodeType === Node.TEXT_NODE) {
-                            salida += child.textContent;
-                        } else if (child.nodeType === Node.ELEMENT_NODE) {
-                            const tag = child.tagName.toLowerCase();
-                            if (tag === "br") {
-                                salida += "\\n";
-                            } else if (tag === "img") {
-                                // Facebook guarda el emoji real en el atributo alt
-                                const alt = child.getAttribute("alt") || "";
-                                salida += alt;
-                            } else {
-                                salida += recorrer(child);
-                                if (tag === "div" || tag === "p") {
-                                    salida += "\\n";
-                                }
-                            }
-                        }
+
+        texto = await locator.evaluate("""
+        element => {
+
+            function leer(node) {
+
+                let resultado = "";
+
+                for (const child of node.childNodes) {
+
+                    /* TEXTO NORMAL */
+                    if (child.nodeType === Node.TEXT_NODE) {
+
+                        resultado += child.textContent || "";
+
+                        continue;
                     }
-                    return salida;
+
+
+                    if (child.nodeType !== Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+
+                    const tag =
+                        child.tagName.toLowerCase();
+
+
+                    /* SALTO DE LÍNEA */
+                    if (tag === "br") {
+
+                        resultado += "\\n";
+
+                        continue;
+                    }
+
+
+                    /* EMOJIS COMO IMG */
+                    if (tag === "img") {
+
+                        const alt =
+                            child.getAttribute("alt");
+
+                        const aria =
+                            child.getAttribute("aria-label");
+
+                        const title =
+                            child.getAttribute("title");
+
+                        const valor =
+                            alt ||
+                            aria ||
+                            title ||
+                            "";
+
+                        if (valor) {
+                            resultado += valor;
+                        }
+
+                        continue;
+                    }
+
+
+                    /*
+                    Algunos emojis/iconos están
+                    dentro de span con aria-label.
+                    */
+                    const aria =
+                        child.getAttribute("aria-label");
+
+
+                    if (
+                        aria &&
+                        aria.length <= 20 &&
+                        /[^\\w\\s]/u.test(aria)
+                    ) {
+
+                        resultado += aria;
+
+                        continue;
+                    }
+
+
+                    resultado += leer(child);
+
+
+                    if (
+                        tag === "div" ||
+                        tag === "p"
+                    ) {
+                        resultado += "\\n";
+                    }
                 }
-                return recorrer(element)
-                    .replace(/\\n{3,}/g, "\\n\\n")
-                    .trim();
+
+                return resultado;
             }
+
+
+            return leer(element)
+                .replace(/\\u00a0/g, " ")
+                .replace(/[ \\t]+\\n/g, "\\n")
+                .replace(/\\n[ \\t]+/g, "\\n")
+                .replace(/\\n{3,}/g, "\\n\\n")
+                .trim();
+        }
         """)
-    except:
+
+        return texto.strip()
+
+    except Exception:
         return ""
 
-# =========================================================
-# BOTÓN VER MÁS
-# =========================================================
-async def expandir_ver_mas(article):
-    try:
-        botones = article.get_by_text(re.compile(r"^(Ver más|See more)$", re.I))
-        cantidad = await botones.count()
-        for i in range(cantidad):
-            try:
-                await botones.nth(i).click(timeout=2500)
-                await asyncio.sleep(0.8)
-            except:
-                pass
-    except:
-        pass
 
-# =========================================================
-# DESCRIPCIÓN
-# =========================================================
 async def obtener_descripcion(article):
-    # Selector principal
+
+    /*
+    Primero buscamos el bloque específico del mensaje.
+    */
+
     try:
-        mensaje = article.locator('[data-ad-preview="message"]')
-        if await mensaje.count() > 0:
-            texto = await texto_con_emojis(mensaje.first)
-            if texto:
-                return texto
+
+        mensajes = article.locator(
+            '[data-ad-preview="message"]'
+        )
+
+        cantidad = await mensajes.count()
+
+        if cantidad:
+
+            candidatos = []
+
+            for i in range(cantidad):
+
+                texto = await obtener_texto_completo(
+                    mensajes.nth(i)
+                )
+
+                if texto:
+                    candidatos.append(texto)
+
+            if candidatos:
+                return max(
+                    candidatos,
+                    key=len
+                )
+
     except:
         pass
 
-    # Alternativa
+
+    /*
+    Método alternativo:
+    buscar bloques grandes de texto.
+    */
+
     try:
-        bloques = article.locator('div[dir="auto"]')
+
+        bloques = article.locator(
+            'div[dir="auto"]'
+        )
+
         cantidad = await bloques.count()
+
         candidatos = []
+
+
         for i in range(cantidad):
+
             try:
-                texto = await texto_con_emojis(bloques.nth(i))
-                texto = texto.strip()
-                if len(texto) < 30:
+
+                texto = await obtener_texto_completo(
+                    bloques.nth(i)
+                )
+
+                if len(texto) < 25:
                     continue
+
+
+                texto_lower = texto.lower()
+
+
                 basura = [
-                    "Todas las reacciones", "Comentar", "Compartir", 
-                    "Enviar", "Seguir página", "Super Farmacia Virgen de Copacabana"
+                    "todas las reacciones",
+                    "comentar",
+                    "compartir",
+                    "seguir página",
+                    "super farmacia virgen de copacabana"
                 ]
-                if any(x.lower() in texto.lower() for x in basura):
+
+
+                if any(
+                    item in texto_lower
+                    for item in basura
+                ):
                     continue
+
+
                 candidatos.append(texto)
+
             except:
                 pass
+
+
         if candidatos:
-            return max(candidatos, key=len)
+
+            return max(
+                candidatos,
+                key=len
+            )
+
     except:
         pass
+
+
     return ""
 
-# =========================================================
-# IMAGEN
-# =========================================================
+
 async def obtener_imagen(article):
+
     try:
+
         imagenes = article.locator("img")
+
         cantidad = await imagenes.count()
+
         candidatas = []
+
+
         for i in range(cantidad):
+
             try:
+
                 datos = await imagenes.nth(i).evaluate("""
-                    img => {
-                        let mejor = img.currentSrc || img.src || "";
-                        const srcset = img.getAttribute("srcset");
-                        if (srcset) {
-                            const opciones = srcset
-                                .split(",")
-                                .map(x => x.trim())
-                                .map(x => {
-                                    const partes = x.split(/\\s+/);
-                                    let size = 0;
-                                    if (partes.length > 1) {
-                                        size = parseInt(partes[1]) || 0;
-                                    }
-                                    return {src: partes[0], size: size};
-                                })
-                                .sort((a,b) => b.size - a.size);
-                            if (opciones.length) {
-                                mejor = opciones[0].src;
-                            }
+                img => {
+
+                    let src =
+                        img.currentSrc ||
+                        img.src ||
+                        "";
+
+                    const srcset =
+                        img.getAttribute("srcset");
+
+
+                    /*
+                    Elegir la imagen más grande
+                    de srcset cuando exista.
+                    */
+
+                    if (srcset) {
+
+                        const opciones =
+                            srcset
+                            .split(",")
+                            .map(x => x.trim())
+                            .map(x => {
+
+                                const partes =
+                                    x.split(/\\s+/);
+
+                                const numero =
+                                    parseInt(partes[1]) || 0;
+
+                                return {
+                                    src: partes[0],
+                                    size: numero
+                                };
+                            })
+                            .sort(
+                                (a,b) =>
+                                b.size - a.size
+                            );
+
+
+                        if (opciones.length) {
+                            src = opciones[0].src;
                         }
-                        return {
-                            src: mejor,
-                            width: img.naturalWidth || img.width || 0,
-                            height: img.naturalHeight || img.height || 0,
-                            alt: img.getAttribute("alt") || ""
-                        };
                     }
+
+
+                    return {
+
+                        src: src,
+
+                        width:
+                            img.naturalWidth ||
+                            img.width ||
+                            0,
+
+                        height:
+                            img.naturalHeight ||
+                            img.height ||
+                            0
+                    };
+                }
                 """)
-                src = datos["src"]
-                ancho = datos["width"]
-                alto = datos["height"]
-                if not src:
+
+
+                if not datos["src"]:
                     continue
-                # Excluir emojis, avatares, logos pequeños
-                if ancho < 400 or alto < 300:
+
+
+                /*
+                Excluir logo, avatar,
+                botones y emojis.
+                */
+
+                if datos["width"] < 500:
                     continue
-                area = ancho * alto
-                candidatas.append((area, src))
+
+                if datos["height"] < 350:
+                    continue
+
+
+                area = (
+                    datos["width"]
+                    *
+                    datos["height"]
+                )
+
+
+                candidatas.append(
+                    (
+                        area,
+                        datos["src"]
+                    )
+                )
+
             except:
                 pass
+
+
         if not candidatas:
             return ""
-        candidatas.sort(key=lambda x: x[0], reverse=True)
+
+
+        candidatas.sort(
+            key=lambda x: x[0],
+            reverse=True
+        )
+
+
         return candidatas[0][1]
+
     except:
         return ""
 
-# =========================================================
-# LINK DEL POST
-# =========================================================
+
 async def obtener_link(article):
+
     try:
-        enlaces = article.locator("a")
-        cantidad = await enlaces.count()
+
+        links = article.locator("a")
+
+        cantidad = await links.count()
+
+
         for i in range(cantidad):
-            try:
-                href = await enlaces.nth(i).get_attribute("href")
-                if not href:
-                    continue
-                # Agregamos "/p/" a la lista de validaciones
-                if ("/posts/" in href or "/photos/" in href or "/videos/" in href or "story_fbid=" in href or "/p/" in href):
-                    if href.startswith("/"):
-                        href = ("https://www.facebook.com" + href)
-                    return href
-            except:
-                pass
+
+            href = await links.nth(i).get_attribute(
+                "href"
+            )
+
+
+            if not href:
+                continue
+
+
+            if (
+                "/posts/" in href
+                or "/photos/" in href
+                or "/videos/" in href
+                or "story_fbid=" in href
+            ):
+
+                if href.startswith("/"):
+
+                    href = (
+                        "https://www.facebook.com"
+                        + href
+                    )
+
+
+                return href
+
     except:
         pass
-    # Retornamos un string vacío en lugar de FACEBOOK_URL
-    return ""
 
-# =========================================================
-# MÉTRICAS
-# =========================================================
+
+    return FACEBOOK_URL
+
+
 def extraer_numero(texto, patrones):
+
     for patron in patrones:
-        match = re.search(patron, texto, re.IGNORECASE)
-        if match:
-            return match.group(1)
+
+        resultado = re.search(
+            patron,
+            texto,
+            re.IGNORECASE
+        )
+
+        if resultado:
+            return resultado.group(1)
+
+
     return "—"
 
-# =========================================================
-# PROCESAR POST
-# =========================================================
-async def procesar_post(article):
-    await expandir_ver_mas(article)
-    await asyncio.sleep(0.5)
 
-    descripcion = await obtener_descripcion(article)
-    if not descripcion:
-        return None
-
-    descripcion = (descripcion
-        .replace("... Ver más", "")
-        .replace("Ver más", "")
-        .strip()
-    )
-
-    imagen = await obtener_imagen(article)
-    if not imagen:
-        return None
-
-    link = await obtener_link(article)
-
-    texto_total = ""
-    try:
-        texto_total = (await article.inner_text())
-    except:
-        pass
-    try:
-        aria = await article.locator("[aria-label]").evaluate_all("""
-            els => els.map(x => x.getAttribute("aria-label"))
-                .filter(Boolean)
-                .join("\\n")
-        """)
-        texto_total += "\\n" + aria
-    except:
-        pass
-
-    likes = extraer_numero(texto_total, [
-        r"Todas las reacciones:\s*([\d.,KkMm]+)",
-        r"([\d.,KkMm]+)\s+reacciones",
-        r"([\d.,KkMm]+)\s+reacción",
-        r"([\d.,KkMm]+)\s+Me gusta"
-    ])
-    comentarios = extraer_numero(texto_total, [
-        r"([\d.,KkMm]+)\s+comentarios",
-        r"([\d.,KkMm]+)\s+comentario"
-    ])
-    compartidos = extraer_numero(texto_total, [
-        r"([\d.,KkMm]+)\s+veces compartido",
-        r"([\d.,KkMm]+)\s+compartidos",
-        r"([\d.,KkMm]+)\s+compartido"
-    ])
-
-    return {
-        "text": descripcion,
-        "image": imagen,
-        "url": link,
-        "date": "Publicación reciente",
-        "likes": likes,
-        "comments_count": comentarios,
-        "shares": compartidos,
-        "scraped_at": datetime.now(timezone.utc).isoformat()
-    }
-
-# =========================================================
-# PRINCIPAL
-# =========================================================
 async def main():
+
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+
+        browser = await p.chromium.launch(
+            headless=True
+        )
+
+
         context = await browser.new_context(
-            viewport={"width": 1920, "height": 1080},
+
+            viewport={
+                "width": 1920,
+                "height": 1080
+            },
+
             locale="es-ES",
+
             user_agent=(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Mozilla/5.0 "
+                "(Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 "
+                "(KHTML, like Gecko) "
                 "Chrome/140.0 Safari/537.36"
             )
         )
+
+
         page = await context.new_page()
+
+
         print("Abriendo Facebook...")
-        await page.goto(FACEBOOK_URL, wait_until="domcontentloaded", timeout=90000)
-        await page.wait_for_timeout(8000)
 
-        posts = []
-        textos_usados = set()
-        urls_usadas = set()
 
-        # Hasta 20 scrolls para intentar obtener 3 posts
-        for scroll in range(20):
-            articles = page.locator('[role="article"]')
-            cantidad = await articles.count()
-            print(f"Scroll {scroll + 1}: {cantidad} artículos visibles")
+        await page.goto(
+            FACEBOOK_URL,
+            wait_until="domcontentloaded",
+            timeout=90000
+        )
 
-            for i in range(cantidad):
-                if len(posts) >= MAX_POSTS:
-                    break
-                
-                article = articles.nth(i)
-                try:
-                    post = await procesar_post(article)
-                    if not post:
-                        continue
-                    
-                    clave_texto = (post["text"][:180])
-                    if clave_texto in textos_usados:
-                        continue
-                    
-                    if (post["url"] and post["url"] in urls_usadas):
-                        continue
-                    
-                    posts.append(post)
-                    textos_usados.add(clave_texto)
-                    if post["url"]:
-                        urls_usadas.add(post["url"])
-                        
-                    print(f"POST {len(posts)} CAPTURADO")
-                except Exception as e:
-                    print("Error en post:", e)
-                    
-            if len(posts) >= MAX_POSTS:
-                break
-                
-            # bajar más
-            await page.evaluate("window.scrollBy(0, window.innerHeight * 1.7)")
-            await page.wait_for_timeout(2500)
-            
-        await browser.close()
-        
-        if not posts:
-            print("No se encontraron publicaciones.")
-            print("Se conserva posts.json anterior.")
+
+        await page.wait_for_timeout(
+            10000
+        )
+
+
+        /*
+        Buscamos publicaciones.
+        */
+
+        articles = page.locator(
+            '[role="article"]'
+        )
+
+
+        cantidad = await articles.count()
+
+
+        print(
+            "Artículos encontrados:",
+            cantidad
+        )
+
+
+        if cantidad == 0:
+
+            print(
+                "No se encontró ninguna publicación."
+            )
+
+            await browser.close()
+
             return
-            
-        with open("posts.json", "w", encoding="utf-8") as archivo:
-            json.dump(posts[:3], archivo, ensure_ascii=False, indent=2)
-            
-        print(f"FINAL: {len(posts[:3])} publicaciones guardadas")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+
+        post_encontrado = None
+
+
+        /*
+        Probamos los primeros artículos
+        hasta encontrar uno con imagen +
+        descripción.
+        */
+
+        for i in range(
+            min(cantidad, 6)
+        ):
+
+            article = articles.nth(i)
+
+
+            try:
+
+                await expandir_ver_mas(
+                    article
+                )
+
+
+                await page.wait_for_timeout(
+                    1000
+                )
+
+
+                descripcion = (
+                    await obtener_descripcion(
+                        article
+                    )
+                )
+
+
+                imagen = (
+                    await obtener_imagen(
+                        article
+                    )
+                )
+
+
+                if not descripcion:
+                    continue
+
+
+                if not imagen:
+                    continue
+
+
+                /*
+                Eliminar únicamente texto
+                de interfaz residual.
+                */
+
+                descripcion = (
+                    descripcion
+                    .replace("... Ver más", "")
+                    .replace("Ver más", "")
+                    .strip()
+                )
+
+
+                texto_metricas = ""
+
+                try:
+                    texto_metricas = (
+                        await article.inner_text()
+                    )
+                except:
+                    pass
+
+
+                try:
+
+                    aria = await article.locator(
+                        "[aria-label]"
+                    ).evaluate_all("""
+                        elementos =>
+                            elementos
+                            .map(
+                                x =>
+                                x.getAttribute(
+                                    "aria-label"
+                                )
+                            )
+                            .filter(Boolean)
+                            .join("\\n")
+                    """)
+
+
+                    texto_metricas += (
+                        "\\n" + aria
+                    )
+
+                except:
+                    pass
+
+
+                likes = extraer_numero(
+                    texto_metricas,
+                    [
+                        r"Todas las reacciones:\\s*([\\d.,KkMm]+)",
+                        r"([\\d.,KkMm]+)\\s+reacciones",
+                        r"([\\d.,KkMm]+)\\s+reacción"
+                    ]
+                )
+
+
+                comentarios = extraer_numero(
+                    texto_metricas,
+                    [
+                        r"([\\d.,KkMm]+)\\s+comentarios",
+                        r"([\\d.,KkMm]+)\\s+comentario"
+                    ]
+                )
+
+
+                compartidos = extraer_numero(
+                    texto_metricas,
+                    [
+                        r"([\\d.,KkMm]+)\\s+veces compartido",
+                        r"([\\d.,KkMm]+)\\s+compartidos",
+                        r"([\\d.,KkMm]+)\\s+compartido"
+                    ]
+                )
+
+
+                link = await obtener_link(
+                    article
+                )
+
+
+                post_encontrado = {
+
+                    "text":
+                        descripcion,
+
+                    "image":
+                        imagen,
+
+                    "url":
+                        link,
+
+                    "date":
+                        "Publicación reciente",
+
+                    "likes":
+                        likes,
+
+                    "comments_count":
+                        comentarios,
+
+                    "shares":
+                        compartidos,
+
+                    "scraped_at":
+                        datetime.now(
+                            timezone.utc
+                        ).isoformat()
+                }
+
+
+                print(
+                    "Última publicación capturada."
+                )
+
+
+                print(
+                    "Texto:",
+                    descripcion
+                )
+
+
+                break
+
+
+            except Exception as e:
+
+                print(
+                    "Error procesando artículo:",
+                    str(e)
+                )
+
+
+        await browser.close()
+
+
+        /*
+        Si Facebook no permitió leer
+        ningún post, conservar archivo anterior.
+        */
+
+        if not post_encontrado:
+
+            print(
+                "No se pudo capturar la publicación."
+            )
+
+            print(
+                "Se conserva posts.json anterior."
+            )
+
+            return
+
+
+        /*
+        Guardar como una lista
+        para mantener compatibilidad
+        con tu index.html actual.
+        */
+
+        with open(
+            "posts.json",
+            "w",
+            encoding="utf-8"
+        ) as archivo:
+
+            json.dump(
+                [post_encontrado],
+                archivo,
+                ensure_ascii=False,
+                indent=2
+            )
+
+
+        print(
+            "posts.json actualizado correctamente."
+        )
+
+
+asyncio.run(main())
