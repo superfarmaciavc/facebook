@@ -1,29 +1,9 @@
 import asyncio
 import json
-import re
 from datetime import datetime, timezone
 from playwright.async_api import async_playwright
 
 FACEBOOK_URL = "https://www.facebook.com/SuperFarmaciaVC/"
-
-
-def buscar_numero(texto, palabras):
-    if not texto:
-        return "—"
-
-    for palabra in palabras:
-        patrones = [
-            rf"([\d.,KkMm]+)\s+{palabra}",
-            rf"{palabra}\s+([\d.,KkMm]+)"
-        ]
-
-        for patron in patrones:
-            match = re.search(patron, texto, re.IGNORECASE)
-
-            if match:
-                return match.group(1)
-
-    return "—"
 
 
 async def main():
@@ -49,10 +29,10 @@ async def main():
 
         await page.wait_for_timeout(10000)
 
-        # Cargar varias publicaciones
+        # Scroll para cargar varias publicaciones
         for _ in range(5):
-            await page.mouse.wheel(0, 1600)
-            await page.wait_for_timeout(1800)
+            await page.mouse.wheel(0, 1500)
+            await page.wait_for_timeout(2000)
 
         articles = page.locator('[role="article"]')
 
@@ -71,134 +51,203 @@ async def main():
 
             try:
 
-                texto_completo = (
-                    await article.inner_text()
-                ).strip()
+                # ---------------------------------
+                # DESCRIPCIÓN DEL POST
+                # ---------------------------------
 
-                if len(texto_completo) < 20:
-                    continue
+                descripcion = ""
 
-                # --------------------------------
-                # TEXTO REAL DE LA PUBLICACIÓN
-                # --------------------------------
-
-                mensaje = ""
-
-                mensaje_locator = article.locator(
+                message = article.locator(
                     '[data-ad-preview="message"]'
                 )
 
-                if await mensaje_locator.count() > 0:
-                    mensaje = (
-                        await mensaje_locator.first.inner_text()
+                if await message.count() > 0:
+                    descripcion = (
+                        await message.first.inner_text()
                     ).strip()
 
-                # Alternativa
-                if not mensaje:
+                # Alternativa si Facebook cambia selector
+                if not descripcion:
 
-                    candidatos = article.locator(
-                        'div[dir="auto"]'
-                    )
+                    bloques = article.locator('div[dir="auto"]')
 
-                    cantidad = await candidatos.count()
+                    cantidad = await bloques.count()
 
-                    textos = []
+                    candidatos = []
 
                     for x in range(cantidad):
 
                         try:
-                            txt = (
-                                await candidatos.nth(x).inner_text()
+                            texto = (
+                                await bloques.nth(x).inner_text()
                             ).strip()
 
-                            if (
-                                len(txt) >= 25
-                                and "Super Farmacia Virgen" not in txt
-                                and "Todas las reacciones" not in txt
-                                and "Ver más" != txt
-                            ):
-                                textos.append(txt)
+                            if len(texto) > 40:
+                                candidatos.append(texto)
 
                         except:
                             pass
 
-                    if textos:
-                        mensaje = max(
-                            textos,
+                    if candidatos:
+                        descripcion = max(
+                            candidatos,
                             key=len
                         )
 
-                if not mensaje:
+                if not descripcion:
                     continue
 
-                # --------------------------------
-                # BUSCAR LA IMAGEN MÁS GRANDE
-                # --------------------------------
 
-                images = article.locator("img")
+                # ---------------------------------
+                # IMAGEN REAL DEL POST
+                # ---------------------------------
 
-                image_count = await images.count()
+                imagen_url = ""
 
-                mejores_imagenes = []
+                imgs = article.locator("img")
 
-                for j in range(image_count):
+                cantidad_imgs = await imgs.count()
 
-                    img = images.nth(j)
+                candidatas = []
+
+                for x in range(cantidad_imgs):
+
+                    img = imgs.nth(x)
 
                     try:
 
                         datos = await img.evaluate("""
-                        el => ({
-                            src: el.currentSrc || el.src || "",
-                            width: el.naturalWidth || el.width || 0,
-                            height: el.naturalHeight || el.height || 0
-                        })
+                        el => {
+                            const srcset = el.getAttribute('srcset');
+
+                            let mejor = el.currentSrc || el.src || '';
+
+                            if (srcset) {
+                                const opciones = srcset
+                                    .split(',')
+                                    .map(x => x.trim().split(' '));
+
+                                if (opciones.length) {
+                                    mejor =
+                                        opciones[opciones.length - 1][0];
+                                }
+                            }
+
+                            return {
+                                src: mejor,
+                                w: el.naturalWidth || 0,
+                                h: el.naturalHeight || 0
+                            };
+                        }
                         """)
 
-                        src = datos["src"]
-
-                        width = datos["width"]
-                        height = datos["height"]
-
-                        if not src:
+                        if not datos["src"]:
                             continue
 
-                        # Excluir iconos / fotos de perfil
-                        if width < 300 or height < 250:
+                        # Excluir logos, avatares e iconos
+                        if datos["w"] < 400 or datos["h"] < 300:
                             continue
 
-                        area = width * height
+                        area = datos["w"] * datos["h"]
 
-                        mejores_imagenes.append(
-                            (area, src)
+                        candidatas.append(
+                            (area, datos["src"])
                         )
 
                     except:
-                        continue
+                        pass
 
-                if not mejores_imagenes:
+                if not candidatas:
                     continue
 
-                mejores_imagenes.sort(
+                candidatas.sort(
                     reverse=True,
                     key=lambda x: x[0]
                 )
 
-                image_url = mejores_imagenes[0][1]
+                imagen_url = candidatas[0][1]
 
-                # --------------------------------
-                # LINK DE LA PUBLICACIÓN
-                # --------------------------------
+
+                # ---------------------------------
+                # TEXTO COMPLETO PARA MÉTRICAS
+                # ---------------------------------
+
+                texto_total = (
+                    await article.inner_text()
+                )
+
+
+                # ---------------------------------
+                # REACCIONES
+                # ---------------------------------
+
+                likes = "—"
+                comments = "—"
+                shares = "—"
+
+                import re
+
+                patrones_like = [
+                    r"Todas las reacciones:\s*([\d.,KkMm]+)",
+                    r"([\d.,KkMm]+)\s+reacciones"
+                ]
+
+                for patron in patrones_like:
+                    m = re.search(
+                        patron,
+                        texto_total,
+                        re.IGNORECASE
+                    )
+                    if m:
+                        likes = m.group(1)
+                        break
+
+
+                patrones_comments = [
+                    r"([\d.,KkMm]+)\s+comentarios",
+                    r"([\d.,KkMm]+)\s+comentario"
+                ]
+
+                for patron in patrones_comments:
+                    m = re.search(
+                        patron,
+                        texto_total,
+                        re.IGNORECASE
+                    )
+                    if m:
+                        comments = m.group(1)
+                        break
+
+
+                patrones_shares = [
+                    r"([\d.,KkMm]+)\s+veces compartido",
+                    r"([\d.,KkMm]+)\s+compartidos"
+                ]
+
+                for patron in patrones_shares:
+                    m = re.search(
+                        patron,
+                        texto_total,
+                        re.IGNORECASE
+                    )
+                    if m:
+                        shares = m.group(1)
+                        break
+
+
+                # ---------------------------------
+                # LINK DEL POST
+                # ---------------------------------
 
                 post_url = FACEBOOK_URL
 
                 links = article.locator("a")
 
-                link_count = await links.count()
+                cantidad_links = await links.count()
 
-                for j in range(link_count):
+                for x in range(cantidad_links):
 
-                    href = await links.nth(j).get_attribute("href")
+                    href = await links.nth(x).get_attribute("href")
 
                     if not href:
                         continue
@@ -216,41 +265,10 @@ async def main():
                         post_url = href
                         break
 
-                # --------------------------------
-                # INTERACCIONES
-                # --------------------------------
-
-                texto_interacciones = texto_completo
-
-                likes = buscar_numero(
-                    texto_interacciones,
-                    [
-                        "reacciones",
-                        "reacción",
-                        "Me gusta"
-                    ]
-                )
-
-                comments = buscar_numero(
-                    texto_interacciones,
-                    [
-                        "comentarios",
-                        "comentario"
-                    ]
-                )
-
-                shares = buscar_numero(
-                    texto_interacciones,
-                    [
-                        "veces compartido",
-                        "compartidos",
-                        "compartido"
-                    ]
-                )
 
                 posts.append({
-                    "text": mensaje[:1800],
-                    "image": image_url,
+                    "text": descripcion,
+                    "image": imagen_url,
                     "url": post_url,
                     "date": "Publicación reciente",
                     "likes": likes,
@@ -262,17 +280,18 @@ async def main():
                 })
 
                 print(
-                    "Publicación",
-                    len(posts),
-                    "capturada"
+                    f"Post {len(posts)} capturado"
                 )
 
             except Exception as e:
+
                 print("Error:", e)
+
 
         await browser.close()
 
-        if len(posts) == 0:
+
+        if not posts:
 
             print(
                 "No se encontraron publicaciones. "
@@ -280,6 +299,7 @@ async def main():
             )
 
             return
+
 
         with open(
             "posts.json",
@@ -294,10 +314,9 @@ async def main():
                 indent=2
             )
 
+
         print(
-            "posts.json actualizado:",
-            len(posts),
-            "publicaciones"
+            f"posts.json actualizado con {len(posts)} publicaciones"
         )
 
 
