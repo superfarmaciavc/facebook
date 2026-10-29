@@ -18,8 +18,14 @@ FACEBOOK_URL = (
     f"https://www.facebook.com/{PAGE_NAME}/"
 )
 
-# Solo queremos la publicación más reciente
-MAX_POSTS = 1
+# Queremos mostrar las últimas 3 publicaciones
+MAX_POSTS = 3
+
+# Revisamos varias publicaciones para evitar fijadas o antiguas
+MAX_CANDIDATOS = 12
+
+# Cada publicación se mostrará 30 segundos
+DURACION_POST = 30
 
 
 # =========================================================
@@ -116,7 +122,7 @@ def normalizar_url(href):
 
 
 # =========================================================
-# CLAVE ÚNICA
+# CLAVE ÚNICA DEL POST
 # =========================================================
 
 def clave_post(url):
@@ -138,6 +144,7 @@ def clave_post(url):
             parsed.query
         )
 
+        # story_fbid
         if "story_fbid" in query:
 
             return (
@@ -146,6 +153,7 @@ def clave_post(url):
                 query["story_fbid"][0]
             )
 
+        # reel
         match = re.search(
             r"/reels?/([^/?]+)",
             path
@@ -159,6 +167,7 @@ def clave_post(url):
                 match.group(1)
             )
 
+        # video
         match = re.search(
             r"/videos/([^/?]+)",
             path
@@ -172,6 +181,7 @@ def clave_post(url):
                 match.group(1)
             )
 
+        # post
         match = re.search(
             r"/posts/([^/?]+)",
             path
@@ -185,6 +195,7 @@ def clave_post(url):
                 match.group(1)
             )
 
+        # share
         match = re.search(
             r"/share/[prv]/([^/?]+)",
             path
@@ -198,6 +209,7 @@ def clave_post(url):
                 match.group(1)
             )
 
+        # permalink
         match = re.search(
             r"/permalink/([^/?]+)",
             path
@@ -216,30 +228,6 @@ def clave_post(url):
     except:
 
         return url
-
-
-# =========================================================
-# DETECTAR VIDEO
-# =========================================================
-
-def es_video_url(url):
-
-    if not url:
-        return False
-
-    u = url.lower()
-
-    return (
-        "/reel/" in u
-        or
-        "/reels/" in u
-        or
-        "/videos/" in u
-        or
-        "/share/r/" in u
-        or
-        "/share/v/" in u
-    )
 
 
 # =========================================================
@@ -334,16 +322,12 @@ async def texto_con_emojis(locator):
 
                 let resultado = "";
 
-                for(
-                    const child
-                    of node.childNodes
-                ){
+                for(const child of node.childNodes){
 
                     if(
                         child.nodeType ===
                         Node.TEXT_NODE
                     ){
-
                         resultado +=
                             child.textContent || "";
 
@@ -390,7 +374,6 @@ async def texto_con_emojis(locator):
                     ){
                         resultado += "\\n";
                     }
-
                 }
 
                 return resultado;
@@ -408,6 +391,74 @@ async def texto_con_emojis(locator):
     except:
 
         return ""
+
+
+# =========================================================
+# DETECTAR PUBLICACIÓN FIJADA
+# =========================================================
+
+async def es_publicacion_fijada(
+    articulo
+):
+
+    try:
+
+        texto = (
+            await articulo.inner_text()
+        ).lower()
+
+        patrones = [
+            "publicación fijada",
+            "publicacion fijada",
+            "post fijado",
+            "fijado",
+            "pinned post",
+            "pinned"
+        ]
+
+        if any(
+            x in texto
+            for x in patrones
+        ):
+
+            return True
+
+    except:
+
+        pass
+
+    try:
+
+        aria = (
+            await articulo
+            .locator("[aria-label]")
+            .evaluate_all("""
+            els =>
+                els
+                .map(
+                    e =>
+                        e.getAttribute("aria-label")
+                        ||
+                        ""
+                )
+                .join("\\n")
+                .toLowerCase()
+            """)
+        )
+
+        if (
+            "fijad" in aria
+            or
+            "pinned" in aria
+        ):
+
+            return True
+
+    except:
+
+        pass
+
+    return False
 
 
 # =========================================================
@@ -478,7 +529,7 @@ async def expandir_ver_mas_articulo(
 
 
 # =========================================================
-# DESCRIPCIÓN
+# OBTENER DESCRIPCIÓN
 # =========================================================
 
 async def obtener_descripcion_articulo(
@@ -663,35 +714,6 @@ async def obtener_metricas_articulo(
 
         pass
 
-    try:
-
-        titles = (
-            await articulo
-            .locator("[title]")
-            .evaluate_all("""
-            els =>
-                els
-                .map(
-                    x =>
-                        x.getAttribute(
-                            "title"
-                        )
-                )
-                .filter(Boolean)
-                .join("\\n")
-            """)
-        )
-
-        texto += (
-            "\n"
-            +
-            titles
-        )
-
-    except:
-
-        pass
-
     likes = buscar_contador(
         texto,
         [
@@ -699,8 +721,7 @@ async def obtener_metricas_articulo(
             r"Todas las reacciones[^0-9]*([\d.,KkMm]+)",
             r"([\d.,KkMm]+)\s+reacciones",
             r"([\d.,KkMm]+)\s+reacción",
-            r"([\d.,KkMm]+)\s+Me gusta",
-            r"([\d.,KkMm]+)\s+personas reaccionaron"
+            r"([\d.,KkMm]+)\s+Me gusta"
         ]
     )
 
@@ -734,7 +755,109 @@ async def obtener_metricas_articulo(
 
 
 # =========================================================
-# MEJOR IMAGEN DESDE ARTÍCULO
+# OBTENER FECHA / TIMESTAMP
+# =========================================================
+
+async def obtener_timestamp_articulo(
+    articulo
+):
+
+    # -----------------------------------------------------
+    # Intentar data-utime
+    # -----------------------------------------------------
+
+    try:
+
+        elementos = articulo.locator(
+            "[data-utime]"
+        )
+
+        cantidad = (
+            await elementos.count()
+        )
+
+        for i in range(
+            cantidad
+        ):
+
+            valor = (
+                await elementos
+                .nth(i)
+                .get_attribute(
+                    "data-utime"
+                )
+            )
+
+            if valor:
+
+                try:
+
+                    timestamp = int(
+                        valor
+                    )
+
+                    if timestamp > 1000000000:
+
+                        return timestamp
+
+                except:
+
+                    pass
+
+    except:
+
+        pass
+
+    # -----------------------------------------------------
+    # Intentar etiqueta time
+    # -----------------------------------------------------
+
+    try:
+
+        tiempos = articulo.locator(
+            "time[datetime]"
+        )
+
+        if await tiempos.count():
+
+            valor = (
+                await tiempos
+                .first
+                .get_attribute(
+                    "datetime"
+                )
+            )
+
+            if valor:
+
+                try:
+
+                    fecha = datetime.fromisoformat(
+                        valor.replace(
+                            "Z",
+                            "+00:00"
+                        )
+                    )
+
+                    return int(
+                        fecha.timestamp()
+                    )
+
+                except:
+
+                    pass
+
+    except:
+
+        pass
+
+    # Si Facebook no entrega timestamp,
+    # dejamos 0 y respetaremos el orden del muro.
+    return 0
+
+
+# =========================================================
+# MEJOR IMAGEN DESDE EL ARTÍCULO
 # =========================================================
 
 async def obtener_mejor_imagen_articulo(
@@ -826,6 +949,7 @@ async def obtener_mejor_imagen_articulo(
                         "emoji"
                     ]
                 ):
+
                     continue
 
                 candidatos.append(
@@ -857,7 +981,7 @@ async def obtener_mejor_imagen_articulo(
 
 
 # =========================================================
-# VIDEO DESDE ARTÍCULO
+# OBTENER VIDEO DESDE EL ARTÍCULO
 # =========================================================
 
 async def obtener_video_articulo(
@@ -1025,7 +1149,7 @@ async def obtener_video_articulo(
 
 
 # =========================================================
-# DESCARGAR
+# DESCARGAR ARCHIVOS
 # =========================================================
 
 async def descargar(
@@ -1092,7 +1216,7 @@ async def descargar(
 
 
 # =========================================================
-# DESCUBRIR POSTS DESDE EL MURO
+# DESCUBRIR PUBLICACIONES DESDE EL MURO
 # =========================================================
 
 async def descubrir_publicaciones(
@@ -1117,6 +1241,9 @@ async def descubrir_publicaciones(
 
     claves = set()
 
+    orden_descubrimiento = 0
+
+    # Revisamos varios scrolls
     for escaneo in range(
         15
     ):
@@ -1144,6 +1271,20 @@ async def descubrir_publicaciones(
         ):
 
             articulo = articulos.nth(i)
+
+            # -------------------------------------------------
+            # IGNORAR PUBLICACIONES FIJADAS
+            # -------------------------------------------------
+
+            if await es_publicacion_fijada(
+                articulo
+            ):
+
+                print(
+                    "Publicación fijada ignorada."
+                )
+
+                continue
 
             links = articulo.locator(
                 "a[href]"
@@ -1206,7 +1347,7 @@ async def descubrir_publicaciones(
                 continue
 
             print(
-                "Nueva publicación desde artículo:",
+                "Nueva publicación encontrada:",
                 clave
             )
 
@@ -1234,6 +1375,12 @@ async def descubrir_publicaciones(
                 articulo
             )
 
+            timestamp = (
+                await obtener_timestamp_articulo(
+                    articulo
+                )
+            )
+
             imagen_url = (
                 await obtener_mejor_imagen_articulo(
                     articulo
@@ -1245,6 +1392,8 @@ async def descubrir_publicaciones(
                     articulo
                 )
             )
+
+            orden_descubrimiento += 1
 
             encontrados.append({
 
@@ -1272,6 +1421,12 @@ async def descubrir_publicaciones(
                 "video_url":
                     video_url,
 
+                "timestamp":
+                    timestamp,
+
+                "order":
+                    orden_descubrimiento,
+
                 "source":
                     "article"
 
@@ -1281,12 +1436,21 @@ async def descubrir_publicaciones(
                 clave
             )
 
-            if len(encontrados) >= MAX_POSTS:
+            if (
+                len(encontrados)
+                >=
+                MAX_CANDIDATOS
+            ):
                 break
 
-        if len(encontrados) >= MAX_POSTS:
+        if (
+            len(encontrados)
+            >=
+            MAX_CANDIDATOS
+        ):
             break
 
+        # Scroll para cargar más publicaciones
         try:
 
             await page.evaluate("""
@@ -1295,7 +1459,7 @@ async def descubrir_publicaciones(
                 window.scrollBy(
                     0,
                     Math.max(
-                        1000,
+                        1200,
                         window.innerHeight
                     )
                 );
@@ -1315,16 +1479,80 @@ async def descubrir_publicaciones(
     print(
         "========================================"
     )
+
     print(
-        "PUBLICACIONES REALES ENCONTRADAS:",
+        "CANDIDATOS ENCONTRADOS:",
         len(encontrados)
     )
+
+    print(
+        "========================================"
+    )
+
+    # =====================================================
+    # ORDENAR POR FECHA
+    # =====================================================
+
+    # Los que tienen timestamp real se ordenan por fecha.
+    # Si Facebook no entrega timestamp, se respeta
+    # el orden natural en que aparecen en el muro.
+
+    con_fecha = [
+        post
+        for post in encontrados
+        if post["timestamp"] > 0
+    ]
+
+    sin_fecha = [
+        post
+        for post in encontrados
+        if post["timestamp"] == 0
+    ]
+
+    con_fecha.sort(
+        key=lambda x:
+            x["timestamp"],
+        reverse=True
+    )
+
+    sin_fecha.sort(
+        key=lambda x:
+            x["order"]
+    )
+
+    if con_fecha:
+
+        ordenados = (
+            con_fecha
+            +
+            sin_fecha
+        )
+
+    else:
+
+        ordenados = sin_fecha
+
+    # Solo las últimas 3
+    resultado = (
+        ordenados[:MAX_POSTS]
+    )
+
+    print("")
+    print(
+        "========================================"
+    )
+
+    print(
+        "PUBLICACIONES SELECCIONADAS:",
+        len(resultado)
+    )
+
     print(
         "========================================"
     )
 
     for i, post in enumerate(
-        encontrados,
+        resultado,
         start=1
     ):
 
@@ -1334,11 +1562,11 @@ async def descubrir_publicaciones(
             post["url"]
         )
 
-    return encontrados
+    return resultado
 
 
 # =========================================================
-# PROCESAR POST SIN ABRIR EL PERMALINK
+# PROCESAR POST
 # =========================================================
 
 async def procesar_post(
@@ -1353,14 +1581,17 @@ async def procesar_post(
     print(
         "========================================"
     )
+
     print(
         "PROCESANDO POST",
         posicion,
         "DESDE EL MURO"
     )
+
     print(
         url
     )
+
     print(
         "========================================"
     )
@@ -1392,9 +1623,9 @@ async def procesar_post(
         exist_ok=True
     )
 
-    # -----------------------------------------------------
+    # =====================================================
     # IMAGEN
-    # -----------------------------------------------------
+    # =====================================================
 
     imagen = ""
 
@@ -1414,9 +1645,9 @@ async def procesar_post(
             )
         )
 
-    # -----------------------------------------------------
+    # =====================================================
     # VIDEO
-    # -----------------------------------------------------
+    # =====================================================
 
     video = ""
 
@@ -1448,6 +1679,32 @@ async def procesar_post(
 
         tipo = "image"
 
+    timestamp = datos.get(
+        "timestamp",
+        0
+    )
+
+    fecha_texto = (
+        "Publicación reciente"
+    )
+
+    if timestamp:
+
+        try:
+
+            fecha_texto = (
+                datetime
+                .fromtimestamp(
+                    timestamp,
+                    timezone.utc
+                )
+                .isoformat()
+            )
+
+        except:
+
+            pass
+
     return {
 
         "type":
@@ -1468,7 +1725,15 @@ async def procesar_post(
             url,
 
         "date":
-            "Publicación reciente",
+            fecha_texto,
+
+        "timestamp":
+            timestamp,
+
+        # MUY IMPORTANTE:
+        # la página debe mostrar este post 30 segundos
+        "duration":
+            DURACION_POST,
 
         "likes":
             likes,
@@ -1597,6 +1862,10 @@ async def main():
 
             return
 
+        # =================================================
+        # GUARDAR POSTS.JSON
+        # =================================================
+
         with open(
             "posts.json",
             "w",
@@ -1614,13 +1883,30 @@ async def main():
         print(
             "========================================"
         )
+
         print(
             "posts.json actualizado."
         )
+
         print(
             "Cantidad:",
             len(resultado)
         )
+
+        print(
+            "Duración por publicación:",
+            DURACION_POST,
+            "segundos"
+        )
+
+        print(
+            "Duración total del ciclo:",
+            len(resultado)
+            *
+            DURACION_POST,
+            "segundos"
+        )
+
         print(
             "========================================"
         )
